@@ -12,7 +12,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-int YEAR = 2024;
+int YEAR = 2025;
 
 class _HomeState extends State<Home> {
   String? accessToken;
@@ -119,9 +119,9 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Activities Calendar')),
+      // appBar: AppBar(title: Text('Activities Calendar')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(2.0),
         child: CalendarView(
             activityDurations: _activityDurations, allActivities: _activities),
       ),
@@ -195,17 +195,19 @@ class CalendarView extends StatelessWidget {
                               ? Colors.green
                               : isActivityDay
                                   ? Colors.yellow
-                                  : Colors.grey[200],
+                                  : day.month % 2 == 1
+                                      ? Colors.grey[200]
+                                      : Colors.grey[300],
                           borderRadius: BorderRadius.circular(4.0),
                         ),
-                        height: 14.0,
+                        height: 15.5,
                         child: Center(
                           child: Text(
                             '${day.day}',
                             style: TextStyle(
                               color:
                                   isActivityDay ? Colors.white : Colors.black,
-                              fontSize: 10,
+                              fontSize: 12,
                             ),
                           ),
                         ),
@@ -220,12 +222,12 @@ class CalendarView extends StatelessWidget {
                   Icon(
                     ikoonid[entry.key],
                     color: Colors.pink,
-                    size: 14.0,
+                    size: 15.5,
                   ),
                   Text(
                     _formatTime(
                         entry.value), // Use a helper method for formatting
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ],
             ],
