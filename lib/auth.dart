@@ -12,7 +12,7 @@ class StravaAuthPage extends StatefulWidget {
 
 class _StravaAuthPageState extends State<StravaAuthPage> {
   final String redirectUri =
-      'http://90.190.108.191/home'; // Replace with your redirect URI
+      'https://treenix.ee'; // Replace with your redirect URI
   String? accessToken;
   Map<String, dynamic>? lastActivity;
 
@@ -29,122 +29,27 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
     }
   }
 
-  Future<void> _handleAuthCode() async {
-    // final tokenUrl = Uri.parse('https://www.strava.com/oauth/token');
-    // String? authCode = Uri.base.queryParameters['code'];
-
-    // // Exchange auth code for access token
-    // final response = await http.post(
-    //   tokenUrl,
-    //   body: {
-    //     'client_id': clientId,
-    //     'client_secret': clientSecret,
-    //     'code': authCode,
-    //     'grant_type': 'authorization_code',
-    //   },
-    // );
-
-    // if (response.statusCode == 200) {
-    //   final data = jsonDecode(response.body);
-    //   setState(() {
-    //     accessToken = data['access_token'];
-    //   });
-
-    //   print('Access Token: $accessToken');
-    // } else {
-    //   print('Failed to get access token: ${response.body}');
-    // }
-  }
-
-  Future<void> _getAthlete() async {
-    String? code = Uri.base.queryParameters['code'];
-
-    // final url = Uri.parse('https://www.strava.com/api/v3/athlete/activities');
-    final url = Uri.parse('https://www.strava.com/api/v3/athlete');
-    final response = await http.get(
-      url,
-      headers: {'Authorization': 'Bearer $code'},
-    );
-
-    if (response.statusCode == 200) {
-      final activities = jsonDecode(response.body);
-      if (activities.isNotEmpty) {
-        setState(() {
-          lastActivity = activities[0];
-        });
-      }
-    } else {
-      print('Failed to fetch activities: ${response.body}');
-    }
-  }
-
-  Future<void> _getLastActivity() async {
-    if (accessToken == null) {
-      print('Authenticate first.');
-      return;
-    }
-
-    final url = Uri.parse('https://www.strava.com/api/v3/athlete/activities');
-    final response = await http.get(
-      url,
-      headers: {'Authorization': 'Bearer $accessToken'},
-    );
-
-    if (response.statusCode == 200) {
-      final activities = jsonDecode(response.body);
-      if (activities.isNotEmpty) {
-        setState(() {
-          lastActivity = activities[0];
-        });
-        print(activities.length);
-      }
-    } else {
-      print('Failed to fetch activities: ${response.body}');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Strava Web Auth')),
+      // appBar: AppBar(title: Text('Strava Web Auth')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (lastActivity != null)
-              Column(
-                children: [
-                  Text('Last Activity:', style: TextStyle(fontSize: 20)),
-                  Text('Name: ${lastActivity!['name']}'),
-                  Text('Distance: ${lastActivity!['distance']} meters'),
-                ],
-              )
-            else
-              Text('No activity loaded.'),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => _authenticate(),
-              child: Text('Authenticate'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Replace with your actual auth code for local testing
-                _handleAuthCode();
-              },
-              child: Text('Fetch Access Token'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _getAthlete();
-              },
-              child: Text('Get Athlete'),
-            ),
-            ElevatedButton(
-              onPressed: _getLastActivity,
-              child: Text('Get Last Activity'),
-            ),
-          ],
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Treenix?', style: TextStyle(fontSize: 30)),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => _authenticate(),
+                child: Text(
+                  'START',
+                  style: TextStyle(fontSize: 30),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
