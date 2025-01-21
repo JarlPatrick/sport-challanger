@@ -30,7 +30,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     String? authCode = Uri.base.queryParameters['code'];
 
-    if (authCode != null) {
+    if (authCode == null) {
       return MaterialApp(home: Home());
     } else {
       return MaterialApp(home: StravaAuthPage());

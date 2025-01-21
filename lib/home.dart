@@ -22,8 +22,8 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    loadAccess();
-    // _getActivitiesThisYear();
+    // loadAccess();
+    _getActivitiesThisYear();
   }
 
   void loadAccess() async {
@@ -77,11 +77,11 @@ class _HomeState extends State<Home> {
         headers: {'Authorization': 'Bearer $accessToken'},
       );
 
-      if (response.statusCode == 200) {
-        final activities = jsonDecode(response.body) as List;
-        // if (true) {
-        // final activities = apireturn;
-        // hasMoreActivities = false;
+      // if (response.statusCode == 200) {
+      // final activities = jsonDecode(response.body) as List;
+      if (true) {
+        final activities = apireturn;
+        hasMoreActivities = false;
         if (activities.isEmpty) {
           hasMoreActivities = false;
         } else {
@@ -120,8 +120,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: AppBar(title: Text('Activities Calendar')),
-      body: Padding(
-        padding: const EdgeInsets.all(2.0),
+      body: Center(
         child: CalendarView(
             activityDurations: _activityDurations, allActivities: _activities),
       ),
@@ -164,76 +163,90 @@ class CalendarView extends StatelessWidget {
       currentDay = currentDay.add(Duration(days: 7));
     }
 
-    return Container(
-      child: ListView.builder(
-        itemCount: weeks.length,
-        itemBuilder: (context, index) {
-          final week = weeks[index];
+    List<List<List<DateTime>>> halves = [
+      weeks.sublist(0, 26),
+      weeks.sublist(26)
+    ];
 
-          // Calculate stats for the week
-          final weekStats = _calculateWeeklyStats(week);
+    return Row(
+      children: [
+        for (var weekhalf in halves)
+          Container(
+            width: 500,
+            height: 900,
+            child: ListView.builder(
+              itemCount: weekhalf.length,
+              itemBuilder: (context, index) {
+                final week = weekhalf[index];
 
-          return Row(
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 500,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: week.map((day) {
-                    final isActivityDay = activityDurations
-                        .containsKey(DateTime(day.year, day.month, day.day));
-                    final isLongActivity = isActivityDay &&
-                        activityDurations[
-                            DateTime(day.year, day.month, day.day)]!;
+                // Calculate stats for the week
+                final weekStats = _calculateWeeklyStats(week);
 
-                    return Expanded(
-                      child: Container(
-                        margin: EdgeInsets.all(1.0),
-                        decoration: BoxDecoration(
-                          color: isLongActivity
-                              ? Colors.green
-                              : isActivityDay
-                                  ? Colors.yellow
-                                  : day.month % 2 == 1
-                                      ? Colors.grey[200]
-                                      : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        height: 15.5,
-                        child: Center(
-                          child: Text(
-                            '${day.day}',
-                            style: TextStyle(
-                              color:
-                                  isActivityDay ? Colors.white : Colors.black,
-                              fontSize: 12,
+                return Row(
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 220,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: week.map((day) {
+                          final isActivityDay = activityDurations.containsKey(
+                              DateTime(day.year, day.month, day.day));
+                          final isLongActivity = isActivityDay &&
+                              activityDurations[
+                                  DateTime(day.year, day.month, day.day)]!;
+
+                          return Expanded(
+                            child: Container(
+                              margin: EdgeInsets.all(1.0),
+                              decoration: BoxDecoration(
+                                color: isLongActivity
+                                    ? Colors.green
+                                    : isActivityDay
+                                        ? Colors.yellow
+                                        : day.month % 2 == 1
+                                            ? Colors.grey[200]
+                                            : Colors.grey[300],
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              height: 30,
+                              child: Center(
+                                child: Text(
+                                  '${day.day}',
+                                  style: TextStyle(
+                                    color: isActivityDay
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        }).toList(),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              // Iterate through the map
-              for (var entry in weekStats.entries)
-                if (entry.value > 0) ...[
-                  Icon(
-                    ikoonid[entry.key],
-                    color: Colors.pink,
-                    size: 15.5,
-                  ),
-                  Text(
-                    _formatTime(
-                        entry.value), // Use a helper method for formatting
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
-                ],
-            ],
-          );
-        },
-      ),
+                    ),
+                    // Iterate through the map
+                    for (var entry in weekStats.entries)
+                      if (entry.value > 0) ...[
+                        Icon(
+                          ikoonid[entry.key],
+                          color: Colors.pink,
+                          size: 20,
+                        ),
+                        Text(
+                          _formatTime(entry
+                              .value), // Use a helper method for formatting
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                  ],
+                );
+              },
+            ),
+          ),
+      ],
     );
   }
 
@@ -241,11 +254,12 @@ class CalendarView extends StatelessWidget {
     int hours = minutes ~/ 60; // Calculate hours
     int remainingMinutes = minutes % 60; // Calculate remaining minutes
 
-    if (hours > 0) {
-      return '${hours} h ${remainingMinutes} min';
-    } else {
-      return '${remainingMinutes} min';
-    }
+    return '${hours}:${remainingMinutes.toString().padLeft(2, "0")}';
+    // if (hours > 0) {
+    //   return '${hours}:${remainingMinutes} min';
+    // } else {
+    //   return '${remainingMinutes} min';
+    // }
   }
 
   Map<String, IconData> ikoonid = {
