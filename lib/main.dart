@@ -6,9 +6,10 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'auth.dart';
 import 'home.dart';
+import 'upload.dart';
 
 void main() {
-  usePathUrlStrategy();
+  // usePathUrlStrategy();
 
   runApp(const MainApp());
 }
@@ -28,30 +29,32 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    String? authCode = Uri.base.queryParameters['code'];
+    // String? authCode = Uri.base.queryParameters['code'];
 
-    if (authCode == null) {
-      return MaterialApp(home: Home());
-    } else {
-      return MaterialApp(home: StravaAuthPage());
-    }
+    // if (authCode != null) {
+    //   return MaterialApp(home: Home());
+    // } else {
+    //   return MaterialApp(home: StravaAuthPage());
+    // }
 
-    // return MaterialApp.router(
-    //   title: "Challanger",
-    //   routerConfig: GoRouter(
-    //     routes: [
-    //       GoRoute(
-    //         path: '/',
-    //         builder: (context, state) => StravaAuthPage(),
-    //       ),
-    //       GoRoute(
-    //         path: "/home",
-    //         builder: (context, state) => Home(
-    //             // activityId: state.uri.queryParameters["activityId"]),
-    //             ),
-    //       ),
-    //     ],
-    //   ),
-    // );
+    return MaterialApp.router(
+      title: "Challanger",
+      routerConfig: GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => StravaAuthPage(),
+          ),
+          GoRoute(
+            path: "/home",
+            builder: (context, state) => Home(),
+          ),
+          GoRoute(
+            path: "/upload",
+            builder: (context, state) => Upload(),
+          ),
+        ],
+      ),
+    );
   }
 }
