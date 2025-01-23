@@ -20,7 +20,7 @@ class JarlsNumber extends StatelessWidget {
     }
 
     // If no such X is found, return 0
-    return 0;
+    return items.length;
   }
 
   @override

@@ -43,16 +43,17 @@ class _MainAppState extends State<MainApp> {
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) => StravaAuthPage(),
-          ),
-          GoRoute(
-            path: "/home",
-            builder: (context, state) => Home(),
-          ),
-          GoRoute(
-            path: "/upload",
+            // builder: (context, state) => StravaAuthPage(),
             builder: (context, state) => Upload(),
           ),
+          // GoRoute(
+          //   path: "/home",
+          //   builder: (context, state) => Home(),
+          // ),
+          // GoRoute(
+          //   path: "/upload",
+          //   builder: (context, state) => Upload(),
+          // ),
         ],
       ),
     );

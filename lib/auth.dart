@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:csv/csv.dart';
 
@@ -50,10 +51,19 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
             children: [
               Text('Treenix?', style: TextStyle(fontSize: 30)),
               SizedBox(height: 20),
+              // ElevatedButton(
+              //   onPressed: () => _authenticate(),
+              //   child: Text(
+              //     'START',
+              //     style: TextStyle(fontSize: 30),
+              //   ),
+              // ),
               ElevatedButton(
-                onPressed: () => _authenticate(),
+                onPressed: () {
+                  context.go(Uri(path: '/upload').toString());
+                },
                 child: Text(
-                  'START',
+                  'GO TO UPLOAD',
                   style: TextStyle(fontSize: 30),
                 ),
               ),
