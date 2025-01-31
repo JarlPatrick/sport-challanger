@@ -5,11 +5,13 @@ class CalendarView extends StatelessWidget {
   final List<Map<String, dynamic>>
       allActivities; // List of all activities with detailed info
   final int YEAR;
+  final bool columns;
 
   CalendarView(
       {required this.activityDurations,
       required this.allActivities,
-      required this.YEAR});
+      required this.YEAR,
+      required this.columns});
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +41,12 @@ class CalendarView extends StatelessWidget {
       currentDay = currentDay.add(Duration(days: 7));
     }
 
-    List<List<List<DateTime>>> halves = [
-      weeks.sublist(0, 26),
-      weeks.sublist(26)
-    ];
+    List<List<List<DateTime>>> halves;
+    if (columns) {
+      halves = [weeks.sublist(0, 26), weeks.sublist(26)];
+    } else {
+      halves = [weeks];
+    }
 
     return Container(
       width: 1000,

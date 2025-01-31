@@ -11,11 +11,12 @@ class JarlsNumber extends StatelessWidget {
   int findLargestX(List<int> items) {
     // Sort the list in descending order
     items.sort((a, b) => b.compareTo(a));
-
+    // print(items);
     // Find the largest X
     for (int i = 0; i < items.length; i++) {
+      // print("${i + 1}  ${items[i]}");
       if (i + 1 >= items[i]) {
-        return i;
+        return i + 1;
       }
     }
 
@@ -32,7 +33,7 @@ class JarlsNumber extends StatelessWidget {
     }
     int JN = findLargestX(Times);
     return Container(
-      height: 200,
+      height: 160,
       width: 200,
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(

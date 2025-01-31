@@ -22,7 +22,8 @@ class StravaAuthPage extends StatefulWidget {
 
 class _StravaAuthPageState extends State<StravaAuthPage> {
   final String redirectUri =
-      'https://treenix.ee'; // Replace with your redirect URI
+      'https://treenix.ee/home'; // Replace with your redirect URI
+  // 'http://90.191.76.145/home';
   String? accessToken;
   Map<String, dynamic>? lastActivity;
 
@@ -51,22 +52,22 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
             children: [
               Text('Treenix?', style: TextStyle(fontSize: 30)),
               SizedBox(height: 20),
-              // ElevatedButton(
-              //   onPressed: () => _authenticate(),
-              //   child: Text(
-              //     'START',
-              //     style: TextStyle(fontSize: 30),
-              //   ),
-              // ),
               ElevatedButton(
-                onPressed: () {
-                  context.go(Uri(path: '/upload').toString());
-                },
+                onPressed: () => _authenticate(),
                 child: Text(
-                  'GO TO UPLOAD',
+                  'START',
                   style: TextStyle(fontSize: 30),
                 ),
               ),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     context.go(Uri(path: '/upload').toString());
+              //   },
+              //   child: Text(
+              //     'GO TO UPLOAD',
+              //     style: TextStyle(fontSize: 30),
+              //   ),
+              // ),
             ],
           ),
         ),

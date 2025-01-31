@@ -25,45 +25,6 @@ class _UploadState extends State<Upload> {
   List<Map<String, dynamic>> _activities = [];
   List<Map<String, dynamic>> _allactivities = [];
 
-  // bool _dragging = false;
-  // Future<void> printFiles(List<DropItem> files, [int depth = 0]) async {
-  //   for (final file in files) {
-  //     String content = await file.readAsString();
-
-  //     List<List<dynamic>> rowsAsListOfValues =
-  //         const CsvToListConverter(eol: "\n").convert(content);
-
-  //     rowsAsListOfValues.removeAt(0);
-
-  //     List<Map<String, dynamic>> allActivities = [];
-
-  //     DateFormat format = DateFormat("MMM d, y, h:mm:ss a");
-  //     // List<Map<String, dynamic>> allActivities = [];
-  //     for (final row in rowsAsListOfValues) {
-  //       Map<String, dynamic> activity = {};
-  //       activity["id"] = row[0];
-  //       String dateString = row[1];
-  //       activity["start_date"] = format.parse(dateString).toString();
-  //       activity["name"] = row[2];
-  //       activity["type"] = row[3];
-  //       activity["elapsed_time"] = row[5];
-  //       activity["distance"] = row[6];
-  //       activity["moving_time"] = row[16];
-
-  //       allActivities.add(activity);
-  //     }
-
-  //     // print(allActivities[0]);
-  //     // print(allActivities.last);
-
-  //     setState(() {
-  //       _allactivities = allActivities;
-  //     });
-
-  //     LoadData();
-  //   }
-  // }
-
   Future<void> pickAndReadFile() async {
     // Create an invisible file input element
     FileUploadInputElement uploadInput = FileUploadInputElement();
@@ -118,66 +79,6 @@ class _UploadState extends State<Upload> {
         });
       }
     });
-
-    // Open the file picker
-    // FilePickerResult? result = await FilePicker.platform.pickFiles(
-    //   type: FileType.custom, // Specify the file type if needed
-    //   allowedExtensions: ['txt', 'json', 'csv'], // Optional extensions
-    // );
-
-    // if (result != null && result.files.isNotEmpty) {
-    //   // // Get the file bytes
-    //   Uint8List? fileBytes = result.files.first.bytes;
-
-    //   // // Get the file name
-    //   // String fileName = result.files.first.name;
-
-    //   // Convert bytes to a string for text-based files
-    //   String fileContent = String.fromCharCodes(fileBytes!);
-
-    //   // print('File Name: $fileName');
-    //   // print('File Content: $fileContent');
-
-    //   // String content = await file.readAsString();
-
-    //   List<List<dynamic>> rowsAsListOfValues =
-    //       const CsvToListConverter(eol: "\n").convert(fileContent);
-
-    //   rowsAsListOfValues.removeAt(0);
-
-    //   List<Map<String, dynamic>> allActivities = [];
-
-    //   DateFormat format = DateFormat("MMM d, y, h:mm:ss a");
-    //   // List<Map<String, dynamic>> allActivities = [];
-    //   for (final row in rowsAsListOfValues) {
-    //     Map<String, dynamic> activity = {};
-    //     activity["id"] = row[0];
-    //     String dateString = row[1];
-    //     activity["start_date"] = format.parse(dateString).toString();
-    //     activity["name"] = row[2];
-    //     activity["type"] = row[3];
-    //     activity["elapsed_time"] = row[5];
-    //     activity["distance"] = row[6];
-    //     activity["moving_time"] = row[16];
-
-    //     int year = format.parse(dateString).year;
-    //     if (!possibleYears.contains(year)) {
-    //       possibleYears.add(year);
-    //     }
-
-    //     allActivities.add(activity);
-    //   }
-
-    //   setState(() {
-    //     _allactivities = allActivities;
-    //   });
-
-    //   LoadData();
-
-    //   // Process the file content as needed
-    // } else {
-    //   print('No file selected');
-    // }
   }
 
   Future<void> LoadData() async {
@@ -245,34 +146,6 @@ class _UploadState extends State<Upload> {
                     child: Text('Select "activities.csv"',
                         style: TextStyle(fontSize: 30)),
                   ),
-                  // DropTarget(
-                  //   onDragDone: (detail) async {
-                  //     await printFiles(detail.files);
-                  //   },
-                  //   onDragUpdated: (details) {},
-                  //   onDragEntered: (detail) {
-                  //     setState(() {
-                  //       _dragging = true;
-                  //     });
-                  //   },
-                  //   onDragExited: (detail) {
-                  //     setState(() {
-                  //       _dragging = false;
-                  //     });
-                  //   },
-                  //   child: Container(
-                  //     height: 200,
-                  //     width: 200,
-                  //     color: _dragging
-                  //         ? Colors.blue.withOpacity(0.4)
-                  //         : Colors.black26,
-                  //     child: Stack(
-                  //       children: [
-                  //         Center(child: Text("Drop here (activities.csv)")),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             )
@@ -285,6 +158,7 @@ class _UploadState extends State<Upload> {
                     activityDurations: _activityDurations,
                     allActivities: _activities,
                     YEAR: YEAR,
+                    columns: true,
                   ),
                   SizedBox(
                     width: 30,
@@ -305,20 +179,6 @@ class _UploadState extends State<Upload> {
                             )),
                         SizedBox(height: 5),
                       ],
-                      // SizedBox(height: 30),
-                      // ElevatedButton(
-                      //     onPressed: () {
-                      //       YEAR = 2024;
-                      //       LoadData();
-                      //     },
-                      //     child: Text("2024", style: TextStyle(fontSize: 30))),
-                      // SizedBox(height: 30),
-                      // ElevatedButton(
-                      //     onPressed: () {
-                      //       YEAR = 2025;
-                      //       LoadData();
-                      //     },
-                      //     child: Text("2025", style: TextStyle(fontSize: 30))),
                       SizedBox(height: 15),
                       JarlsNumber(allActivities: _activities),
                       SizedBox(height: 30),
