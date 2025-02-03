@@ -30,14 +30,14 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
   Future<void> _authenticate() async {
     // Generate Strava OAuth URL
     final authUrl = Uri.parse('https://www.strava.com/oauth/mobile/authorize?'
-        'client_id=$CLIENTID&response_type=code&redirect_uri=$redirectUri&approval_prompt=auto&scope=read,activity:read');
+        'client_id=$CLIENTID&response_type=code&redirect_uri=$redirectUri&approval_prompt=auto&scope=read,activity:read_all');
 
     // Open the URL in the browser
-    if (await canLaunch(authUrl.toString())) {
-      await launch(authUrl.toString());
-    } else {
-      throw 'Could not launch $authUrl';
-    }
+    await launchUrl(authUrl);
+    // if (await launchUrl(authUrl)) {
+    // } else {
+    //   throw 'Could not launch $authUrl';
+    // }
   }
 
   @override
@@ -47,7 +47,7 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
       // appBar: AppBar(title: Text('Strava Web Auth')),
       body: Container(
         padding: const EdgeInsets.all(16.0),
-        color: Color(0xFF2E2E2E),
+        // color: Color(0xFF2E2E2E),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

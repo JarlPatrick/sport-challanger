@@ -10,6 +10,7 @@ import 'calendar_view.dart';
 import 'j-index.dart';
 import 'secret.dart';
 import 'totals.dart';
+import 'widget_streak.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -22,15 +23,13 @@ int YEAR = 2025;
 
 class _HomeState extends State<Home> {
   String? accessToken;
-  // final String clientId = '111297'; // Replace with your client ID
-  // final String clientSecret = '9165c87e1af5ed7f4d8d5a89c564ae63af97cbc7';
   List<Map<String, dynamic>> _activities = [];
   bool calendarView = true;
 
   @override
   void initState() {
-    // loadAccess();
-    _getActivitiesThisYear();
+    loadAccess();
+    // _getActivitiesThisYear();
   }
 
   MapboxMapController? controller;
@@ -39,14 +38,6 @@ class _HomeState extends State<Home> {
   }
 
   void _onStyleLoaded() async {
-    print("tere");
-    // controller!.addCircle(
-    //   const CircleOptions(
-    //     geometry: LatLng(59.46706512548259, 24.824713815561047),
-    //     circleColor: "#FF0000",
-    //     circleRadius: 3,
-    //   ),
-    // );
     addLinesToMap(_activities);
   }
 
@@ -186,11 +177,12 @@ class _HomeState extends State<Home> {
         headers: {'Authorization': 'Bearer $accessToken'},
       );
 
-      // if (response.statusCode == 200) {
-      //   final activities = jsonDecode(response.body) as List;
-      if (true) {
-        final activities = apireturn;
-        hasMoreActivities = false;
+      if (response.statusCode == 200) {
+        final activities = jsonDecode(response.body) as List;
+        // if (true) {
+        //   final activities = apireturn;
+        //   hasMoreActivities = false;
+        //   print(activities);
         if (activities.isEmpty) {
           hasMoreActivities = false;
         } else {
@@ -361,89 +353,5 @@ class _HomeState extends State<Home> {
         ),
       );
     }
-  }
-}
-
-class TreenixStreak extends StatelessWidget {
-  final List<Map<String, dynamic>> allActivities;
-
-  const TreenixStreak({
-    required this.allActivities,
-  });
-
-  int calculateRunningStreak(List<DateTime> runStartTimes, DateTime now) {
-    // Normalize the 'now' DateTime to just the date (no time part)
-    DateTime today = DateTime(now.year, now.month, now.day);
-
-    // Sort the list in descending order
-    runStartTimes.sort((a, b) => b.compareTo(a));
-
-    // Normalize all dates in the list to remove the time part
-    List<DateTime> normalizedDates = runStartTimes
-        .map((date) => DateTime(date.year, date.month, date.day))
-        .toSet() // Remove duplicates (same day runs)
-        .toList()
-      ..sort((a, b) => b.compareTo(a));
-
-    int streak = 0;
-
-    // Start streak checking
-    for (int i = 0; i < normalizedDates.length; i++) {
-      if (streak == 0) {
-        // Check if the streak starts from today or yesterday
-        if (normalizedDates[i] == today ||
-            normalizedDates[i] == today.subtract(Duration(days: 1))) {
-          streak++;
-        }
-      } else {
-        // Check if the next date is exactly one day before the current date
-        if (normalizedDates[i] ==
-            normalizedDates[i - 1].subtract(Duration(days: 1))) {
-          streak++;
-        } else {
-          break; // End the streak if a day is skipped
-        }
-      }
-    }
-
-    return streak;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    List<DateTime> allDates = [];
-    for (var activity in allActivities) {
-      allDates.add(DateTime.parse(activity['start_date']));
-    }
-    DateTime today = DateTime.now();
-
-    int streak = calculateRunningStreak(allDates, today);
-    print("Streak $streak");
-
-    return Container(
-      height: 160,
-      width: 200,
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: const Color.fromARGB(255, 255, 184, 251),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Text(
-              "Streak",
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              streak.toString(),
-              style: TextStyle(fontSize: 50),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
