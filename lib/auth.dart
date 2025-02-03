@@ -43,9 +43,11 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: Color(0x2E2E2E),
       // appBar: AppBar(title: Text('Strava Web Auth')),
-      body: Padding(
+      body: Container(
         padding: const EdgeInsets.all(16.0),
+        color: Color(0xFF2E2E2E),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

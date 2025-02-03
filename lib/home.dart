@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:polyline_codec/polyline_codec.dart';
+import 'dart:math';
 
 import 'api_dummy.dart';
 import 'calendar_view.dart';
@@ -22,11 +25,29 @@ class _HomeState extends State<Home> {
   // final String clientId = '111297'; // Replace with your client ID
   // final String clientSecret = '9165c87e1af5ed7f4d8d5a89c564ae63af97cbc7';
   List<Map<String, dynamic>> _activities = [];
+  bool calendarView = true;
 
   @override
   void initState() {
-    loadAccess();
-    // _getActivitiesThisYear();
+    // loadAccess();
+    _getActivitiesThisYear();
+  }
+
+  MapboxMapController? controller;
+  void _onMapCreated(MapboxMapController controller) {
+    this.controller = controller;
+  }
+
+  void _onStyleLoaded() async {
+    print("tere");
+    // controller!.addCircle(
+    //   const CircleOptions(
+    //     geometry: LatLng(59.46706512548259, 24.824713815561047),
+    //     circleColor: "#FF0000",
+    //     circleRadius: 3,
+    //   ),
+    // );
+    addLinesToMap(_activities);
   }
 
   void loadAccess() async {
@@ -58,6 +79,88 @@ class _HomeState extends State<Home> {
     }
   }
 
+  /// Check if the polyline is closed
+  bool isClosed(List<LatLng> points, double thresholdMeters) {
+    if (points.length < 3) return false;
+
+    double distance = haversineDistance(points.first, points.last);
+    return distance < thresholdMeters;
+  }
+
+  /// Compute the enclosed area using the Shoelace formula
+  double calculateEnclosedArea(List<LatLng> points) {
+    if (points.length < 3) return 0.0; // Not a polygon
+
+    double sum = 0.0;
+    for (int i = 0; i < points.length - 1; i++) {
+      sum += (points[i].longitude * points[i + 1].latitude) -
+          (points[i + 1].longitude * points[i].latitude);
+    }
+
+    // Closing segment
+    sum += (points.last.longitude * points.first.latitude) -
+        (points.first.longitude * points.last.latitude);
+
+    return (sum.abs() / 2.0) *
+        111319.9 *
+        111319.9; // Convert degrees to square meters
+  }
+
+  /// Haversine formula to compute distance between two LatLng points
+  double haversineDistance(LatLng p1, LatLng p2) {
+    const double R = 6371000; // Earth radius in meters
+    double lat1 = radians(p1.latitude);
+    double lon1 = radians(p1.longitude);
+    double lat2 = radians(p2.latitude);
+    double lon2 = radians(p2.longitude);
+
+    double dLat = lat2 - lat1;
+    double dLon = lon2 - lon1;
+
+    double a =
+        pow(sin(dLat / 2), 2) + cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return R * c;
+  }
+
+  /// Convert degrees to radians
+  double radians(double degrees) {
+    return degrees * pi / 180;
+  }
+
+  List<LatLng> PolylineToLatLng(String polyline) {
+    List<List<num>> points = PolylineCodec.decode(polyline);
+    return points.map((p) => LatLng(p[0].toDouble(), p[1].toDouble())).toList();
+  }
+
+  void addLinesToMap(List<Map<String, dynamic>> activities) {
+    for (var act in activities) {
+      String poly = act["map"]["summary_polyline"];
+      if (poly != "") {
+        List<LatLng> langs = PolylineToLatLng(poly);
+        if (controller == null) {
+          print("Error: MapController is null");
+          return;
+        }
+        if (isClosed(langs, 100.0)) {
+          // 10 meters threshold
+          double area = calculateEnclosedArea(langs) / (1000 * 1000);
+          print("Enclosed Area: ${area.toStringAsFixed(1)} km^2");
+        } else {
+          print("The polyline is not closed.");
+        }
+        controller!.addLine(
+          LineOptions(
+            geometry: langs!,
+            lineColor: "#FF0000",
+            lineWidth: 3.0,
+          ),
+        );
+      }
+    }
+  }
+
   Map<DateTime, bool> _activityDurations =
       {}; // Maps dates to whether activity duration > 20 minutes
 
@@ -83,11 +186,11 @@ class _HomeState extends State<Home> {
         headers: {'Authorization': 'Bearer $accessToken'},
       );
 
-      if (response.statusCode == 200) {
-        final activities = jsonDecode(response.body) as List;
-        // if (true) {
-        //   final activities = apireturn;
-        //   hasMoreActivities = false;
+      // if (response.statusCode == 200) {
+      //   final activities = jsonDecode(response.body) as List;
+      if (true) {
+        final activities = apireturn;
+        hasMoreActivities = false;
         if (activities.isEmpty) {
           hasMoreActivities = false;
         } else {
@@ -120,6 +223,8 @@ class _HomeState extends State<Home> {
       _activityDurations = activityDurations;
       _activities = allactivities;
     });
+
+    addLinesToMap(allactivities);
   }
 
   @override
@@ -128,18 +233,40 @@ class _HomeState extends State<Home> {
 
     if (screenWidth > 600) {
       return Scaffold(
-        // appBar: AppBar(title: Text('Activities Calendar')),
         body: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
             children: [
-              CalendarView(
-                activityDurations: _activityDurations,
-                allActivities: _activities,
-                YEAR: YEAR,
-                columns: true,
-              ),
+              !calendarView
+                  ? Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10)),
+                      width: 1000,
+                      height: 900,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: MapboxMap(
+                          styleString: MapboxStyles.DARK,
+                          initialCameraPosition: const CameraPosition(
+                            target:
+                                // LatLng(59.46706512548259, 24.824713815561047),
+                                LatLng(58.810327075722086, 25.12594825181547),
+                            zoom: 6.7,
+                          ),
+                          accessToken:
+                              "pk.eyJ1IjoicmE1bXU1IiwiYSI6ImNremp1ZGwydjBwNGIybmxsNmpiMG1pZHoifQ.B6kcgUxR8ljeGPpYDw1ImA",
+                          onMapCreated: _onMapCreated,
+                          onStyleLoadedCallback: _onStyleLoaded,
+                        ),
+                      ),
+                    )
+                  : CalendarView(
+                      activityDurations: _activityDurations,
+                      allActivities: _activities,
+                      YEAR: YEAR,
+                      columns: true,
+                    ),
               SizedBox(
                 width: 30,
               ),
@@ -151,6 +278,9 @@ class _HomeState extends State<Home> {
                     children: [
                       ElevatedButton(
                           onPressed: () {
+                            if (controller != null) {
+                              controller!.clearLines();
+                            }
                             setState(() {
                               YEAR = YEAR - 1;
                             });
@@ -160,6 +290,9 @@ class _HomeState extends State<Home> {
                       Text(YEAR.toString(), style: TextStyle(fontSize: 30)),
                       ElevatedButton(
                           onPressed: () {
+                            if (controller != null) {
+                              controller!.clearLines();
+                            }
                             setState(() {
                               YEAR = YEAR + 1;
                             });
@@ -167,6 +300,16 @@ class _HomeState extends State<Home> {
                           },
                           child: Text("+", style: TextStyle(fontSize: 30))),
                     ],
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        calendarView = !calendarView;
+                      });
+                    },
+                    child: Text("Toggle Calendar/Map",
+                        style: TextStyle(fontSize: 30)),
                   ),
                   SizedBox(height: 20),
                   if (YEAR == 2025) ...[

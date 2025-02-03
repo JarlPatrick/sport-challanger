@@ -39,12 +39,13 @@ class _MainAppState extends State<MainApp> {
 
     return MaterialApp.router(
       title: "Treenix",
+      // color: Color(0x2E2E2E),
       routerConfig: GoRouter(
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) => StravaAuthPage(),
-            // builder: (context, state) => Home(),
+            // builder: (context, state) => StravaAuthPage(),
+            builder: (context, state) => Home(),
           ),
           GoRoute(
             path: "/home",
