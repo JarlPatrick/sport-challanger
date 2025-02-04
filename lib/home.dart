@@ -45,28 +45,52 @@ class _HomeState extends State<Home> {
     final tokenUrl = Uri.parse('https://www.strava.com/oauth/token');
     String? authCode = Uri.base.queryParameters['code'];
 
+    getStravaAccessToken(authCode!);
     // Exchange auth code for access token
-    final response = await http.post(
-      tokenUrl,
-      body: {
-        'client_id': CLIENTID,
-        'client_secret': CLENTSECRET,
-        'code': authCode,
-        'grant_type': 'authorization_code',
-      },
-    );
+    // final response = await http.post(
+    //   tokenUrl,
+    //   body: {
+    //     'client_id': CLIENTID,
+    //     'client_secret': CLENTSECRET,
+    //     'code': authCode,
+    //     'grant_type': 'authorization_code',
+    //   },
+    // );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      setState(() {
-        accessToken = data['access_token'];
-      });
+    // if (response.statusCode == 200) {
+    //   final data = jsonDecode(response.body);
+    //   setState(() {
+    //     accessToken = data['access_token'];
+    //   });
 
-      print('Access Token: $accessToken');
+    //   print('Access Token: $accessToken');
 
-      _getActivitiesThisYear();
-    } else {
-      print('Failed to get access token: ${response.body}');
+    //   _getActivitiesThisYear();
+    // } else {
+    //   print('Failed to get access token: ${response.body}');
+    // }
+  }
+
+  Future<String?> getStravaAccessToken(String code) async {
+    String lambdaUrl =
+        "https://1t13kva7le.execute-api.eu-north-1.amazonaws.com/default/strava-get-access-token";
+    try {
+      final response = await http.post(
+        Uri.parse(lambdaUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"code": code}),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(data);
+        return data["access_token"];
+      } else {
+        print("Error: ${response.statusCode} - ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return null;
     }
   }
 

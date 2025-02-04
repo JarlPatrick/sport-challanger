@@ -21,8 +21,8 @@ class StravaAuthPage extends StatefulWidget {
 }
 
 class _StravaAuthPageState extends State<StravaAuthPage> {
-  final String redirectUri =
-      'https://treenix.ee/home'; // Replace with your redirect URI
+  final String redirectUri = 'http://90.190.108.191/home';
+  // 'https://treenix.ee/home'; // Replace with your redirect URI
   // 'http://90.191.76.145/home';
   String? accessToken;
   Map<String, dynamic>? lastActivity;
