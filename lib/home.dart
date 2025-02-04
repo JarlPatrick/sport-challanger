@@ -77,7 +77,7 @@ class _HomeState extends State<Home> {
     try {
       final response = await http.post(
         Uri.parse(lambdaUrl),
-        headers: {"Content-Type": "application/json"},
+        // headers: {"Content-Type": "application/json"},
         body: jsonEncode({"code": code}),
       );
       if (response.statusCode == 200) {
