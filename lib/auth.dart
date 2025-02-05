@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 
 import 'package:csv/csv.dart';
 
@@ -33,10 +34,50 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
 
     // Open the URL in the browser
     await launchUrl(authUrl);
-    // if (await launchUrl(authUrl)) {
-    // } else {
-    //   throw 'Could not launch $authUrl';
-    // }
+  }
+
+  Future<String> getToken() async {
+    final result = await Amplify.Auth.fetchAuthSession();
+    // print(result);
+    // print("");
+    var a = result.toString().split("idToken")[1];
+    var b = a.split('"')[2];
+    var token = b.split('\"')[0];
+    return token;
+  }
+
+  Future<String?> getStravaAccessToken() async {
+    String lambdaUrl =
+        "https://1t13kva7le.execute-api.eu-north-1.amazonaws.com/default/strava-get-access-token";
+    try {
+      String token = await getToken();
+      print(token);
+
+      final response = await http.post(
+        Uri.parse(lambdaUrl),
+        // headers: {"a": "b"},
+        headers: <String, String>{
+          "Authorization": token,
+        },
+        body: jsonEncode({
+          "type": "access",
+        }),
+      );
+      print(response.body);
+
+      return "";
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(data);
+        return data["access_token"];
+      } else {
+        print("Error: ${response.statusCode} - ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return null;
+    }
   }
 
   @override
@@ -60,15 +101,15 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
                   style: TextStyle(fontSize: 30),
                 ),
               ),
-              // ElevatedButton(
-              //   onPressed: () {
-              //     context.go(Uri(path: '/upload').toString());
-              //   },
-              //   child: Text(
-              //     'GO TO UPLOAD',
-              //     style: TextStyle(fontSize: 30),
-              //   ),
-              // ),
+              ElevatedButton(
+                onPressed: () {
+                  getStravaAccessToken();
+                },
+                child: Text(
+                  'PING',
+                  style: TextStyle(fontSize: 30),
+                ),
+              ),
             ],
           ),
         ),
