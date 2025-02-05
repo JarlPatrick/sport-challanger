@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:polyline_codec/polyline_codec.dart';
 import 'dart:math';
+import 'package:amplify_flutter/amplify_flutter.dart';
 
 import 'api_dummy.dart';
 import 'calendar_view.dart';
@@ -45,7 +46,13 @@ class _HomeState extends State<Home> {
     final tokenUrl = Uri.parse('https://www.strava.com/oauth/token');
     String? authCode = Uri.base.queryParameters['code'];
 
-    String? access_token = await getStravaAccessToken(authCode!);
+    String? access_token;
+    if (authCode != null) {
+      access_token = await getStravaAccessToken(authCode);
+    } else {
+      access_token = await getStravaAccessToken("");
+    }
+
     if (access_token != null) {
       setState(() {
         accessToken = access_token;
@@ -77,14 +84,30 @@ class _HomeState extends State<Home> {
     // }
   }
 
+  Future<String> getToken() async {
+    final result = await Amplify.Auth.fetchAuthSession();
+    // print(result);
+    // print("");
+    var a = result.toString().split("idToken")[1];
+    var b = a.split('"')[2];
+    var token = b.split('\"')[0];
+    return token;
+  }
+
   Future<String?> getStravaAccessToken(String code) async {
     String lambdaUrl =
-        "https://1t13kva7le.execute-api.eu-north-1.amazonaws.com/default/strava-get-access-token";
+        "https://6iks67rav1.execute-api.eu-north-1.amazonaws.com/default/strava-get-access-token";
     try {
+      String token = await getToken();
+
       final response = await http.post(
         Uri.parse(lambdaUrl),
-        // headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"code": code}),
+        headers: <String, String>{
+          "Authorization": token,
+        },
+        body: jsonEncode({
+          "code": code,
+        }),
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

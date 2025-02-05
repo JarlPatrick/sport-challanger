@@ -36,49 +36,48 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
     await launchUrl(authUrl);
   }
 
-  Future<String> getToken() async {
-    final result = await Amplify.Auth.fetchAuthSession();
-    // print(result);
-    // print("");
-    var a = result.toString().split("idToken")[1];
-    var b = a.split('"')[2];
-    var token = b.split('\"')[0];
-    return token;
-  }
+  // Future<String> getToken() async {
+  //   final result = await Amplify.Auth.fetchAuthSession();
+  //   // print(result);
+  //   // print("");
+  //   var a = result.toString().split("idToken")[1];
+  //   var b = a.split('"')[2];
+  //   var token = b.split('\"')[0];
+  //   return token;
+  // }
 
-  Future<String?> getStravaAccessToken() async {
-    String lambdaUrl =
-        "https://1t13kva7le.execute-api.eu-north-1.amazonaws.com/default/strava-get-access-token";
-    try {
-      String token = await getToken();
-      print(token);
+  // Future<String?> getStravaAccessToken() async {
+  //   String lambdaUrl =
+  //       "https://6iks67rav1.execute-api.eu-north-1.amazonaws.com/default/strava-get-access-token";
+  //   try {
+  //     String token = await getToken();
+  //     // print(token);
 
-      final response = await http.post(
-        Uri.parse(lambdaUrl),
-        // headers: {"a": "b"},
-        headers: <String, String>{
-          "Authorization": token,
-        },
-        body: jsonEncode({
-          "type": "access",
-        }),
-      );
-      print(response.body);
+  //     final response = await http.post(
+  //       Uri.parse(lambdaUrl),
+  //       // headers: {"a": "b"},
+  //       headers: <String, String>{
+  //         "Authorization": token,
+  //       },
+  //       body: jsonEncode({
+  //         "type": "access",
+  //       }),
+  //     );
+  //     print(response.body);
 
-      return "";
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print(data);
-        return data["access_token"];
-      } else {
-        print("Error: ${response.statusCode} - ${response.body}");
-        return null;
-      }
-    } catch (e) {
-      print("Exception: $e");
-      return null;
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       print(data);
+  //       return data["access_token"];
+  //     } else {
+  //       print("Error: ${response.statusCode} - ${response.body}");
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print("Exception: $e");
+  //     return null;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -101,15 +100,15 @@ class _StravaAuthPageState extends State<StravaAuthPage> {
                   style: TextStyle(fontSize: 30),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  getStravaAccessToken();
-                },
-                child: Text(
-                  'PING',
-                  style: TextStyle(fontSize: 30),
-                ),
-              ),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     getStravaAccessToken();
+              //   },
+              //   child: Text(
+              //     'PING',
+              //     style: TextStyle(fontSize: 30),
+              //   ),
+              // ),
             ],
           ),
         ),
