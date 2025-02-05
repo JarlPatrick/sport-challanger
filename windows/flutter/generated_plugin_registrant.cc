@@ -6,12 +6,12 @@
 
 #include "generated_plugin_registrant.h"
 
-#include <desktop_drop/desktop_drop_plugin.h>
+#include <amplify_db_common/amplify_db_common_plugin.h>
 #include <url_launcher_windows/url_launcher_windows.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
-  DesktopDropPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("DesktopDropPlugin"));
+  AmplifyDbCommonPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("AmplifyDbCommonPlugin"));
   UrlLauncherWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("UrlLauncherWindows"));
 }

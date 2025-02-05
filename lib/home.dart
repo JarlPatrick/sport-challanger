@@ -45,7 +45,13 @@ class _HomeState extends State<Home> {
     final tokenUrl = Uri.parse('https://www.strava.com/oauth/token');
     String? authCode = Uri.base.queryParameters['code'];
 
-    getStravaAccessToken(authCode!);
+    String? access_token = await getStravaAccessToken(authCode!);
+    if (access_token != null) {
+      setState(() {
+        accessToken = access_token;
+      });
+      _getActivitiesThisYear();
+    }
     // Exchange auth code for access token
     // final response = await http.post(
     //   tokenUrl,
