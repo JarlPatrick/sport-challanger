@@ -1,4 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+
+Map<String, IconData> ikoonid = {
+  'cycling': Icons.directions_bike,
+  'running': Icons.directions_run,
+  'swimming': Icons.pool,
+  'skiing': Icons.downhill_skiing,
+  'others': Icons.question_mark,
+  'walking': Icons.directions_walk,
+  'hiking': Icons.hiking_rounded,
+};
+
+Map<String, Color> varvid = {
+  'cycling': Colors.pink,
+  'running': Colors.green,
+  'swimming': Colors.purple,
+  'skiing': Colors.lightBlue,
+  'others': Colors.grey,
+  'walking': Colors.grey,
+  'hiking': Colors.grey,
+};
 
 class CalendarView extends StatelessWidget {
   final Map<DateTime, bool> activityDurations;
@@ -7,11 +28,12 @@ class CalendarView extends StatelessWidget {
   final int YEAR;
   final bool columns;
 
-  CalendarView(
-      {required this.activityDurations,
-      required this.allActivities,
-      required this.YEAR,
-      required this.columns});
+  CalendarView({
+    required this.activityDurations,
+    required this.allActivities,
+    required this.YEAR,
+    required this.columns,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +137,7 @@ class CalendarView extends StatelessWidget {
                         ),
                       ),
                       // Iterate through the map
+                      // weeklyBarView(weekStats: weekStats),
                       for (var entry in weekStats.entries)
                         if (entry.value > 0) ...[
                           Icon(
@@ -151,16 +174,6 @@ class CalendarView extends StatelessWidget {
     // }
   }
 
-  Map<String, IconData> ikoonid = {
-    'cycling': Icons.directions_bike,
-    'running': Icons.directions_run,
-    'swimming': Icons.pool,
-    'skiing': Icons.downhill_skiing,
-    'others': Icons.question_mark,
-    'walking': Icons.directions_walk,
-    'hiking': Icons.hiking_rounded,
-  };
-
   Map<String, int> _calculateWeeklyStats(List<DateTime> week) {
     // Initialize stats for the week
     int cyclingMinutes = 0;
@@ -177,7 +190,7 @@ class CalendarView extends StatelessWidget {
       if (week.contains(normalizedDate)) {
         final String type = activity['type'];
         final int duration =
-            activity['elapsed_time'] ~/ 60; // Convert seconds to minutes
+            activity['moving_time'] ~/ 60; // Convert seconds to minutes
         switch (type) {
           case 'Ride':
             cyclingMinutes += duration;
@@ -216,5 +229,47 @@ class CalendarView extends StatelessWidget {
       'hiking': hikinggMinutes,
       'others': othersMinutes,
     };
+  }
+}
+
+class weeklyBarView extends StatelessWidget {
+  const weeklyBarView({
+    super.key,
+    required this.weekStats,
+  });
+  final Map<String, int> weekStats;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 10,
+      width: 100,
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.start,
+          groupsSpace: 0,
+          gridData: FlGridData(show: false),
+          titlesData: FlTitlesData(show: false),
+          borderData: FlBorderData(show: false),
+          barGroups: [
+            for (var entry in weekStats.entries)
+              if (entry.value > 0) ...[
+                BarChartGroupData(
+                  x: 0, // Position on the X-axis
+                  barRods: [
+                    BarChartRodData(
+                      toY: 20, // Height of the bar
+                      width: entry.value.toDouble() / 3, // Width of the bar
+                      // width: 20,
+                      color: varvid[entry.key], // Bar color
+                      borderRadius: BorderRadius.zero,
+                    ),
+                  ],
+                ),
+              ],
+          ],
+        ),
+      ),
+    );
   }
 }

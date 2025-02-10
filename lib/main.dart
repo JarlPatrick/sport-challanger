@@ -9,7 +9,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 
 import 'amplifyconfiguration.dart';
 
-import 'auth.dart';
+// import 'auth.dart';
 import 'home.dart';
 
 void main() {
@@ -53,13 +53,13 @@ class _MainAppState extends State<MainApp> {
           routes: [
             GoRoute(
               path: '/',
-              builder: (context, state) => StravaAuthPage(),
-              // builder: (context, state) => Home(),
-            ),
-            GoRoute(
-              path: "/home",
+              // builder: (context, state) => StravaAuthPage(),
               builder: (context, state) => Home(),
             ),
+            // GoRoute(
+            //   path: "/home",
+            //   builder: (context, state) => Home(),
+            // ),
           ],
         ),
       ),

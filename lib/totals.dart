@@ -30,7 +30,7 @@ class Totals extends StatelessWidget {
       final activityDate = DateTime.parse(activity['start_date']);
       final String type = activity['type'];
       final int duration =
-          activity['elapsed_time'] ~/ 60; // Convert seconds to minutes
+          activity['moving_time'] ~/ 60; // Convert seconds to minutes
       switch (type) {
         case 'Ride':
           cyclingMinutes += duration;
