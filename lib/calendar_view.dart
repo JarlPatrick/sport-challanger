@@ -1,5 +1,7 @@
+import 'package:Treenix/_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 
 Map<String, IconData> ikoonid = {
   'cycling': Icons.directions_bike,
@@ -65,29 +67,51 @@ class CalendarView extends StatelessWidget {
 
     List<List<List<DateTime>>> halves;
     if (columns) {
-      halves = [weeks.sublist(0, 26), weeks.sublist(26)];
+      // halves = [weeks.sublist(0, 26), weeks.sublist(26)];
+      halves = [
+        weeks.sublist(0, 13),
+        weeks.sublist(13, 26),
+        weeks.sublist(26, 39),
+        weeks.sublist(39)
+      ];
     } else {
       halves = [weeks];
     }
 
     return Container(
-      width: 780,
-      height: 900,
+      width: 1600,
+      height: 600,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: const Color.fromARGB(255, 255, 184, 251)),
+        borderRadius: BorderRadius.circular(10),
+        // color: const Color.fromARGB(255, 255, 184, 251)),
+        color: TreenixColors.grayBackground,
+      ),
       padding: EdgeInsets.all(10),
       // color: const Color.fromARGB(255, 202, 198, 255),
       child: Row(
         children: [
           for (var weekhalf in halves)
             Container(
-              width: 380,
+              width: 390,
               height: 900,
               child: ListView.builder(
                 itemCount: weekhalf.length,
                 itemBuilder: (context, index) {
                   final week = weekhalf[index];
+
+                  bool startnewmonth = false;
+                  bool endnewmonth = false;
+                  String monthName = "";
+                  for (var paev in week) {
+                    if (paev.day == 1) {
+                      monthName = DateFormat.MMMM().format(paev);
+                      if (week.take(4).contains(paev)) {
+                        startnewmonth = true;
+                      } else {
+                        endnewmonth = true;
+                      }
+                    }
+                  }
 
                   // Calculate stats for the week
                   // final weekStats = _calculateWeeklyStats(week);
@@ -98,68 +122,98 @@ class CalendarView extends StatelessWidget {
 
                   // Map<String, int> sortedMap = Map.fromEntries(sortedEntries);
 
-                  return Row(
-                    // crossAxisAlignment: CrossAxisAlignment.start,
+                  return Column(
                     children: [
-                      Container(
-                        width: 220,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: week.map((day) {
-                            final isActivityDay = activityDurations.containsKey(
-                                DateTime(day.year, day.month, day.day));
-                            final isLongActivity = isActivityDay &&
-                                activityDurations[
-                                    DateTime(day.year, day.month, day.day)]!;
+                      if (startnewmonth) ...[
+                        SizedBox(height: 5),
+                        Text(
+                          monthName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: TreenixColors.primaryPink,
+                          ),
+                        ),
+                      ],
+                      Row(
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 220,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: week.map((day) {
+                                final isActivityDay =
+                                    activityDurations.containsKey(
+                                        DateTime(day.year, day.month, day.day));
+                                final isLongActivity = isActivityDay &&
+                                    activityDurations[DateTime(
+                                        day.year, day.month, day.day)]!;
 
-                            return Expanded(
-                              child: Container(
-                                margin: EdgeInsets.all(1.0),
-                                decoration: BoxDecoration(
-                                  color: isLongActivity
-                                      ? Colors.green
-                                      : isActivityDay
-                                          ? Colors.yellow
-                                          : day.month % 2 == 1
-                                              ? Colors.grey[200]
-                                              : Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
-                                height: 30,
-                                child: Center(
-                                  child: Text(
-                                    '${day.day}',
-                                    style: TextStyle(
-                                      color: isActivityDay
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontSize: 15,
+                                return Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.all(1.0),
+                                    decoration: BoxDecoration(
+                                      color: isLongActivity
+                                          ? TreenixColors.primaryPink
+                                          // : isActivityDay
+                                          // ? Colors.yellow
+                                          // : day.month % 2 == 1
+                                          //     ? Colors.grey[200]
+                                          //     : Colors.grey[300],
+                                          : TreenixColors.lightGray,
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
+                                    height: 30,
+                                    child: Center(
+                                      child: Text(
+                                        '${day.day}',
+                                        style: TextStyle(
+                                          color: isLongActivity
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontSize: 15,
+                                        ),
+                                      ),
                                     ),
                                   ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          // Iterate through the map
+                          // weeklyBarView(weekStats: weekStats),
+                          SizedBox(width: 5),
+                          for (var entry in weekStats.entries
+                              .where((e) => e.value > 0)
+                              .take(3))
+                            if (entry.value > 0) ...[
+                              Icon(
+                                ikoonid[entry.key],
+                                color: TreenixColors.primaryPink,
+                                size: 20,
+                              ),
+                              Text(
+                                _formatTime(entry
+                                    .value), // Use a helper method for formatting
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: TreenixColors.lightGray,
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      // Iterate through the map
-                      // weeklyBarView(weekStats: weekStats),
-                      for (var entry in weekStats.entries
-                          .where((e) => e.value > 0)
-                          .take(3))
-                        if (entry.value > 0) ...[
-                          Icon(
-                            ikoonid[entry.key],
-                            color: Colors.pink,
-                            size: 20,
-                          ),
-                          Text(
-                            _formatTime(entry
-                                .value), // Use a helper method for formatting
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold),
-                          ),
+                            ],
                         ],
+                      ),
+                      if (endnewmonth) ...[
+                        SizedBox(height: 5),
+                        Text(
+                          monthName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: TreenixColors.primaryPink,
+                          ),
+                        ),
+                      ],
                     ],
                   );
                 },

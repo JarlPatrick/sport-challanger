@@ -7,9 +7,11 @@ import 'dart:math';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '_colors.dart';
 import 'api_dummy.dart';
 import 'calendar_view.dart';
 import 'j-index.dart';
+import 'mapView.dart';
 import 'secret.dart';
 import 'totals.dart';
 import 'widget_streak.dart';
@@ -24,6 +26,8 @@ class Home extends StatefulWidget {
 int YEAR = 2025;
 
 class _HomeState extends State<Home> {
+  final GlobalKey<MapViewState> mapViewKey = GlobalKey<MapViewState>();
+
   String? accessToken;
   List<Map<String, dynamic>> _activities = [];
   List<Map<String, dynamic>> _allactivities = [];
@@ -110,6 +114,7 @@ class _HomeState extends State<Home> {
         activities.add(activity);
       }
     }
+    mapViewKey.currentState?.loadYear(year);
     setState(() {
       _activities = activities;
     });
@@ -118,7 +123,7 @@ class _HomeState extends State<Home> {
   Future<void> _getActivitiesThisYear() async {
     getActivities();
     List<Map<String, dynamic>> activitiesThisYear = [];
-    for (var activity in _) return;
+    // for (var activity in _) return;
     final currentYear = DateTime(YEAR).year; //DateTime.now().year;
     final startDate = DateTime(currentYear, 1, 1).millisecondsSinceEpoch ~/
         1000; // Unix timestamp for Jan 1st
@@ -252,14 +257,123 @@ class _HomeState extends State<Home> {
     if (StravaConnected) {
       if (screenWidth > 600) {
         return Scaffold(
+          backgroundColor: TreenixColors.lightGray,
           body: Center(
-            child: Row(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(width: 30),
+                    Container(
+                      height: 160,
+                      width: 400,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: TreenixColors.grayBackground,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: TreenixColors.lightGray,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    YEAR = YEAR - 1;
+                                  });
+                                  loadYear(YEAR);
+                                  // _getActivitiesThisYear();
+                                },
+                                child: Text(
+                                  "-",
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    color: TreenixColors.primaryPink,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 15),
+                              Text(
+                                YEAR.toString(),
+                                style: TextStyle(
+                                  fontSize: 40,
+                                  color: TreenixColors.primaryPink,
+                                ),
+                              ),
+                              SizedBox(width: 15),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: TreenixColors.lightGray,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    YEAR = YEAR + 1;
+                                  });
+                                  loadYear(YEAR);
+                                },
+                                child: Text(
+                                  "+",
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    color: TreenixColors.primaryPink,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: TreenixColors.lightGray,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                calendarView = !calendarView;
+                              });
+                            },
+                            child: Text(
+                              "Toggle Calendar/Map",
+                              style: TextStyle(
+                                fontSize: 25,
+                                color: TreenixColors.primaryPink,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ElevatedButton(
+                    //     onPressed: () {
+                    //       getActivities();
+                    //     },
+                    //     child: Text("PING")),
+                    SizedBox(width: 20),
+                    // if (YEAR == 2025) ...[
+                    TreenixStreak(allActivities: _activities),
+                    SizedBox(width: 20),
+                    // ],
+                    JarlsNumber(allActivities: _activities),
+                    SizedBox(width: 20),
+                    Totals(allActivities: _activities),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
                 !calendarView
                     ? MapView(
-                        activities: _activities,
+                        key: mapViewKey,
+                        allactivities: _allactivities,
                       )
                     : CalendarView(
                         activityDurations: _activityDurations,
@@ -267,97 +381,150 @@ class _HomeState extends State<Home> {
                         YEAR: YEAR,
                         columns: true,
                       ),
-                SizedBox(
-                  width: 30,
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    SizedBox(height: 30),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                YEAR = YEAR - 1;
-                              });
-                              _getActivitiesThisYear();
-                            },
-                            child: Text("-", style: TextStyle(fontSize: 30))),
-                        Text(YEAR.toString(), style: TextStyle(fontSize: 30)),
-                        ElevatedButton(
-                            onPressed: () {
-                              // if (controller != null) {
-                              //   controller!.clearLines();
-                              // }
-                              setState(() {
-                                YEAR = YEAR + 1;
-                              });
-                              _getActivitiesThisYear();
-                            },
-                            child: Text("+", style: TextStyle(fontSize: 30))),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          calendarView = !calendarView;
-                        });
-                      },
-                      child: Text("Toggle Calendar/Map",
-                          style: TextStyle(fontSize: 30)),
-                    ),
-                    // ElevatedButton(
-                    //     onPressed: () {
-                    //       getActivities();
-                    //     },
-                    //     child: Text("PING")),
-                    SizedBox(height: 20),
-                    if (YEAR == 2025) ...[
-                      TreenixStreak(allActivities: _activities),
-                      SizedBox(height: 20),
-                    ],
-                    JarlsNumber(allActivities: _activities),
-                    SizedBox(height: 20),
-                    Totals(allActivities: _activities),
-                  ],
-                ),
               ],
             ),
           ),
         );
       } else {
         return Scaffold(
+          backgroundColor: TreenixColors.lightGray,
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.max,
               children: [
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    TreenixStreak(allActivities: _activities),
-                    SizedBox(width: 10),
-                    JarlsNumber(allActivities: _activities),
-                  ],
-                ),
                 SizedBox(height: 10),
-                // SizedBox(height: 10),
                 Container(
-                  height: 400,
-                  width: 400,
-                  child: CalendarView(
-                    activityDurations: _activityDurations,
-                    allActivities: _activities,
-                    YEAR: YEAR,
-                    columns: false,
+                  height: 120,
+                  width: MediaQuery.of(context).size.width - 20,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: TreenixColors.grayBackground,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: TreenixColors.lightGray,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                YEAR = YEAR - 1;
+                              });
+                              loadYear(YEAR);
+                              // _getActivitiesThisYear();
+                            },
+                            child: Text(
+                              "-",
+                              style: TextStyle(
+                                fontSize: 40,
+                                color: TreenixColors.primaryPink,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 15),
+                          Text(
+                            YEAR.toString(),
+                            style: TextStyle(
+                              fontSize: 40,
+                              color: TreenixColors.primaryPink,
+                            ),
+                          ),
+                          SizedBox(width: 15),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: TreenixColors.lightGray,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                YEAR = YEAR + 1;
+                              });
+                              loadYear(YEAR);
+                            },
+                            child: Text(
+                              "+",
+                              style: TextStyle(
+                                fontSize: 40,
+                                color: TreenixColors.primaryPink,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: TreenixColors.lightGray,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            calendarView = !calendarView;
+                          });
+                        },
+                        child: Text(
+                          "Toggle Calendar/Map",
+                          style: TextStyle(
+                            fontSize: 25,
+                            color: TreenixColors.primaryPink,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: 10),
-                Totals(allActivities: _activities),
+                if (!calendarView) ...[
+                  Container(
+                    height: MediaQuery.of(context).size.height - 150,
+                    width: MediaQuery.of(context).size.width - 20,
+                    child: MapView(
+                      key: mapViewKey,
+                      allactivities: _allactivities,
+                    ),
+                  )
+                ] else ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Container(
+                        // height: 140,
+                        width: (MediaQuery.of(context).size.width - 30) / 2,
+                        child: TreenixStreak(allActivities: _activities),
+                      ),
+                      SizedBox(width: 10),
+                      Container(
+                        // height: 140,
+                        width: (MediaQuery.of(context).size.width - 30) / 2,
+                        child: JarlsNumber(allActivities: _activities),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    height: 120,
+                    width: MediaQuery.of(context).size.width - 20,
+                    child: Totals(allActivities: _activities),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    height: MediaQuery.of(context).size.height - 460,
+                    width: MediaQuery.of(context).size.width - 20,
+                    child: CalendarView(
+                      activityDurations: _activityDurations,
+                      allActivities: _activities,
+                      YEAR: YEAR,
+                      columns: false,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                ]
               ],
             ),
           ),
@@ -386,147 +553,5 @@ class _HomeState extends State<Home> {
         ),
       );
     }
-  }
-}
-
-class MapView extends StatefulWidget {
-  final List<Map<String, dynamic>> activities;
-  MapView({
-    super.key,
-    required this.activities,
-  });
-
-  @override
-  State<MapView> createState() => _MapViewState();
-}
-
-class _MapViewState extends State<MapView> {
-  MapboxMapController? controller;
-  void _onMapCreated(MapboxMapController controller) {
-    this.controller = controller;
-  }
-
-  void _onStyleLoaded() async {
-    addLinesToMap(widget.activities);
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    if (controller != null) {
-      controller!.clearLines();
-    }
-    addLinesToMap(widget.activities);
-  }
-
-  /// Haversine formula to compute distance between two LatLng points
-  double haversineDistance(LatLng p1, LatLng p2) {
-    const double R = 6371000; // Earth radius in meters
-    double lat1 = radians(p1.latitude);
-    double lon1 = radians(p1.longitude);
-    double lat2 = radians(p2.latitude);
-    double lon2 = radians(p2.longitude);
-
-    double dLat = lat2 - lat1;
-    double dLon = lon2 - lon1;
-
-    double a =
-        pow(sin(dLat / 2), 2) + cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-
-    return R * c;
-  }
-
-  /// Check if the polyline is closed
-  bool isClosed(List<LatLng> points, double thresholdMeters) {
-    if (points.length < 3) return false;
-
-    double distance = haversineDistance(points.first, points.last);
-    return distance < thresholdMeters;
-  }
-
-  /// Compute the enclosed area using the Shoelace formula
-  double calculateEnclosedArea(List<LatLng> points) {
-    if (points.length < 3) return 0.0; // Not a polygon
-
-    double sum = 0.0;
-    for (int i = 0; i < points.length - 1; i++) {
-      sum += (points[i].longitude * points[i + 1].latitude) -
-          (points[i + 1].longitude * points[i].latitude);
-    }
-
-    // Closing segment
-    sum += (points.last.longitude * points.first.latitude) -
-        (points.first.longitude * points.last.latitude);
-
-    return (sum.abs() / 2.0) *
-        111319.9 *
-        111319.9; // Convert degrees to square meters
-  }
-
-  /// Convert degrees to radians
-  double radians(double degrees) {
-    return degrees * pi / 180;
-  }
-
-  List<LatLng> PolylineToLatLng(String polyline) {
-    List<List<num>> points = PolylineCodec.decode(polyline);
-    return points.map((p) => LatLng(p[0].toDouble(), p[1].toDouble())).toList();
-  }
-
-  void addLinesToMap(List<Map<String, dynamic>> activities) {
-    for (var act in activities) {
-      // print(act);
-      String poly = act["map_polyline"];
-      print(act["name"]);
-      // print(poly);
-      if (poly != "") {
-        List<LatLng> langs = PolylineToLatLng(poly);
-        if (controller == null) {
-          print("Error: MapController is null");
-          return;
-        }
-        if (isClosed(langs, 100.0)) {
-          // 10 meters threshold
-          double area = calculateEnclosedArea(langs) / (1000 * 1000);
-          // print("Enclosed Area: ${area.toStringAsFixed(1)} km^2");
-        } else {
-          // print("The polyline is not closed.");
-        }
-        controller!.addLine(
-          LineOptions(
-            geometry: langs!,
-            lineColor: "#FF0000",
-            lineWidth: 3.0,
-          ),
-        );
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-      width: 1000,
-      height: 900,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: MapboxMap(
-          styleString: MapboxStyles.DARK,
-          initialCameraPosition: const CameraPosition(
-            target:
-                // LatLng(59.46706512548259, 24.824713815561047),
-                LatLng(58.810327075722086, 25.12594825181547),
-            zoom: 6.7,
-          ),
-          accessToken:
-              "pk.eyJ1IjoicmE1bXU1IiwiYSI6ImNremp1ZGwydjBwNGIybmxsNmpiMG1pZHoifQ.B6kcgUxR8ljeGPpYDw1ImA",
-          onMapCreated: _onMapCreated,
-          onStyleLoadedCallback: _onStyleLoaded,
-        ),
-      ),
-    );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:Treenix/_colors.dart';
 import 'package:flutter/material.dart';
 
 class Totals extends StatelessWidget {
@@ -81,39 +82,47 @@ class Totals extends StatelessWidget {
   Widget build(BuildContext context) {
     Map<String, int> stats = _calculateAllStats();
     return Container(
-      height: 400,
-      width: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: const Color.fromARGB(255, 255, 184, 251),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          for (var entry in stats.entries)
-            if (entry.value > 0) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  // SizedBox(width: 20),
-                  Icon(
-                    ikoonid[entry.key],
-                    color: Colors.pink,
-                    size: 40,
+        height: 160,
+        width: 600,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: TreenixColors.grayBackground,
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              SizedBox(width: 20),
+              for (var entry in stats.entries)
+                if (entry.value > 0) ...[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      // SizedBox(width: 20),
+                      Icon(
+                        ikoonid[entry.key],
+                        color: TreenixColors.primaryPink,
+                        size: 50,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        _formatTime(
+                            entry.value), // Use a helper method for formatting
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: TreenixColors.primaryPink,
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(width: 20),
-                  Text(
-                    _formatTime(
-                        entry.value), // Use a helper method for formatting
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
                 ],
-              ),
             ],
-        ],
-      ),
-    );
+          ),
+        ));
   }
 }

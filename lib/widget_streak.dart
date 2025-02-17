@@ -1,3 +1,4 @@
+import 'package:Treenix/_colors.dart';
 import 'package:flutter/material.dart';
 
 class TreenixStreak extends StatelessWidget {
@@ -62,7 +63,7 @@ class TreenixStreak extends StatelessWidget {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: const Color.fromARGB(255, 255, 184, 251),
+        color: TreenixColors.grayBackground,
       ),
       child: Center(
         child: Column(
@@ -71,11 +72,17 @@ class TreenixStreak extends StatelessWidget {
           children: [
             Text(
               "Streak",
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(
+                fontSize: 20,
+                color: TreenixColors.primaryPink,
+              ),
             ),
             Text(
               streak.toString(),
-              style: TextStyle(fontSize: 50),
+              style: TextStyle(
+                fontSize: 50,
+                color: TreenixColors.primaryPink,
+              ),
             ),
           ],
         ),

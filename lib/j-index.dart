@@ -1,3 +1,4 @@
+import 'package:Treenix/_colors.dart';
 import 'package:flutter/material.dart';
 
 class JarlsNumber extends StatelessWidget {
@@ -38,7 +39,7 @@ class JarlsNumber extends StatelessWidget {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: const Color.fromARGB(255, 255, 184, 251),
+        color: TreenixColors.grayBackground,
       ),
       child: Center(
         child: Column(
@@ -47,15 +48,24 @@ class JarlsNumber extends StatelessWidget {
           children: [
             Text(
               "J-index",
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(
+                fontSize: 20,
+                color: TreenixColors.primaryPink,
+              ),
             ),
             Text(
               JN.toString(),
-              style: TextStyle(fontSize: 50),
+              style: TextStyle(
+                fontSize: 50,
+                color: TreenixColors.primaryPink,
+              ),
             ),
             Text(
               "You have $JN activities that last longer that $JN minutes",
-              style: TextStyle(fontSize: 12),
+              style: TextStyle(
+                fontSize: 12,
+                color: TreenixColors.primaryPink,
+              ),
             ),
           ],
         ),
