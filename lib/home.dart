@@ -26,7 +26,7 @@ int YEAR = 2025;
 class _HomeState extends State<Home> {
   String? accessToken;
   List<Map<String, dynamic>> _activities = [];
-  List<Map<String, dynamic>> _allActivities = [];
+  List<Map<String, dynamic>> _allactivities = [];
   bool calendarView = true;
 
   bool StravaConnected = true;
@@ -101,6 +101,19 @@ class _HomeState extends State<Home> {
 
   Map<DateTime, bool> _activityDurations =
       {}; // Maps dates to whether activity duration > 20 minutes
+
+  Future<void> loadYear(int year) async {
+    List<Map<String, dynamic>> activities = [];
+    for (var activity in _allactivities) {
+      final parsedDate = DateTime.parse(activity['start_date']);
+      if (parsedDate.year == year) {
+        activities.add(activity);
+      }
+    }
+    setState(() {
+      _activities = activities;
+    });
+  }
 
   Future<void> _getActivitiesThisYear() async {
     getActivities();
@@ -210,8 +223,9 @@ class _HomeState extends State<Home> {
 
         setState(() {
           _activityDurations = activityDurations;
-          _activities = allactivities;
+          _allactivities = allactivities;
         });
+        loadYear(YEAR);
       } else {
         print("Error: ${response.statusCode} - ${response.body}");
       }
@@ -294,11 +308,11 @@ class _HomeState extends State<Home> {
                       child: Text("Toggle Calendar/Map",
                           style: TextStyle(fontSize: 30)),
                     ),
-                    ElevatedButton(
-                        onPressed: () {
-                          getActivities();
-                        },
-                        child: Text("PING")),
+                    // ElevatedButton(
+                    //     onPressed: () {
+                    //       getActivities();
+                    //     },
+                    //     child: Text("PING")),
                     SizedBox(height: 20),
                     if (YEAR == 2025) ...[
                       TreenixStreak(allActivities: _activities),
