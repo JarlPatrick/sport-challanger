@@ -71,7 +71,7 @@ class CalendarView extends StatelessWidget {
     }
 
     return Container(
-      width: 1000,
+      width: 780,
       height: 900,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -82,7 +82,7 @@ class CalendarView extends StatelessWidget {
         children: [
           for (var weekhalf in halves)
             Container(
-              width: 480,
+              width: 380,
               height: 900,
               child: ListView.builder(
                 itemCount: weekhalf.length,
@@ -90,7 +90,13 @@ class CalendarView extends StatelessWidget {
                   final week = weekhalf[index];
 
                   // Calculate stats for the week
-                  final weekStats = _calculateWeeklyStats(week);
+                  // final weekStats = _calculateWeeklyStats(week);
+                  // weekStats
+                  var weekStats = Map.fromEntries(
+                      _calculateWeeklyStats(week).entries.toList()
+                        ..sort((a, b) => b.value.compareTo(a.value)));
+
+                  // Map<String, int> sortedMap = Map.fromEntries(sortedEntries);
 
                   return Row(
                     // crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +144,9 @@ class CalendarView extends StatelessWidget {
                       ),
                       // Iterate through the map
                       // weeklyBarView(weekStats: weekStats),
-                      for (var entry in weekStats.entries)
+                      for (var entry in weekStats.entries
+                          .where((e) => e.value > 0)
+                          .take(3))
                         if (entry.value > 0) ...[
                           Icon(
                             ikoonid[entry.key],

@@ -26,6 +26,7 @@ int YEAR = 2025;
 class _HomeState extends State<Home> {
   String? accessToken;
   List<Map<String, dynamic>> _activities = [];
+  List<Map<String, dynamic>> _allActivities = [];
   bool calendarView = true;
 
   bool StravaConnected = true;
@@ -33,11 +34,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     loadAccess();
-    // _getActivitiesThisYear();
   }
 
   void loadAccess() async {
-    final tokenUrl = Uri.parse('https://www.strava.com/oauth/token');
+    // final tokenUrl = Uri.parse('https://www.strava.com/oauth/token');
     String? authCode = Uri.base.queryParameters['code'];
 
     String? access_token;
@@ -51,7 +51,8 @@ class _HomeState extends State<Home> {
       setState(() {
         accessToken = access_token;
       });
-      _getActivitiesThisYear();
+      // _getActivitiesThisYear();
+      getActivities();
     } else {
       setState(() {
         StravaConnected = false;
@@ -103,7 +104,8 @@ class _HomeState extends State<Home> {
 
   Future<void> _getActivitiesThisYear() async {
     getActivities();
-    return;
+    List<Map<String, dynamic>> activitiesThisYear = [];
+    for (var activity in _) return;
     final currentYear = DateTime(YEAR).year; //DateTime.now().year;
     final startDate = DateTime(currentYear, 1, 1).millisecondsSinceEpoch ~/
         1000; // Unix timestamp for Jan 1st
