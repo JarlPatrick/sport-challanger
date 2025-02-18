@@ -80,7 +80,11 @@ class Totals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, int> stats = _calculateAllStats();
+    // Map<String, int> stats = _calculateAllStats();
+    Map<String, int> stats = Map.fromEntries(
+        _calculateAllStats().entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value)));
+
     return Container(
         height: 160,
         width: 600,
@@ -114,7 +118,7 @@ class Totals extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: TreenixColors.primaryPink,
+                          color: TreenixColors.lightGray,
                         ),
                       ),
                     ],

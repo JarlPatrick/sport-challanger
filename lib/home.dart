@@ -1,3 +1,4 @@
+import 'package:Treenix/j-indexGraph.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -15,6 +16,7 @@ import 'mapView.dart';
 import 'secret.dart';
 import 'totals.dart';
 import 'widget_streak.dart';
+import 'yearSelector.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -25,6 +27,8 @@ class Home extends StatefulWidget {
 
 int YEAR = 2025;
 
+enum TreenixView { Map, Calendar, JGraph }
+
 class _HomeState extends State<Home> {
   final GlobalKey<MapViewState> mapViewKey = GlobalKey<MapViewState>();
 
@@ -34,6 +38,8 @@ class _HomeState extends State<Home> {
   bool calendarView = true;
 
   bool StravaConnected = true;
+
+  TreenixView viewState = TreenixView.Calendar;
 
   @override
   void initState() {
@@ -250,6 +256,19 @@ class _HomeState extends State<Home> {
     await launchUrl(authUrl);
   }
 
+  void changeViewState(TreenixView state) {
+    setState(() {
+      viewState = state;
+    });
+  }
+
+  void setYear(int year) {
+    setState(() {
+      YEAR = year;
+    });
+    loadYear(YEAR);
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -268,101 +287,23 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(width: 30),
-                    Container(
-                      height: 160,
-                      width: 400,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: TreenixColors.grayBackground,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: TreenixColors.lightGray,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    YEAR = YEAR - 1;
-                                  });
-                                  loadYear(YEAR);
-                                  // _getActivitiesThisYear();
-                                },
-                                child: Text(
-                                  "-",
-                                  style: TextStyle(
-                                    fontSize: 40,
-                                    color: TreenixColors.primaryPink,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 15),
-                              Text(
-                                YEAR.toString(),
-                                style: TextStyle(
-                                  fontSize: 40,
-                                  color: TreenixColors.primaryPink,
-                                ),
-                              ),
-                              SizedBox(width: 15),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: TreenixColors.lightGray,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    YEAR = YEAR + 1;
-                                  });
-                                  loadYear(YEAR);
-                                },
-                                child: Text(
-                                  "+",
-                                  style: TextStyle(
-                                    fontSize: 40,
-                                    color: TreenixColors.primaryPink,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: TreenixColors.lightGray,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                calendarView = !calendarView;
-                              });
-                            },
-                            child: Text(
-                              "Toggle Calendar/Map",
-                              style: TextStyle(
-                                fontSize: 25,
-                                color: TreenixColors.primaryPink,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    Yearselector(
+                      YEAR: YEAR,
+                      setYearCallback: setYear,
+                      viewStateCallback: changeViewState,
                     ),
-                    // ElevatedButton(
-                    //     onPressed: () {
-                    //       getActivities();
-                    //     },
-                    //     child: Text("PING")),
                     SizedBox(width: 20),
                     // if (YEAR == 2025) ...[
-                    TreenixStreak(allActivities: _activities),
+                    TreenixStreak(
+                      allActivities: _activities,
+                      viewStateCallback: changeViewState,
+                    ),
                     SizedBox(width: 20),
                     // ],
-                    JarlsNumber(allActivities: _activities),
+                    JarlsNumber(
+                      allActivities: _activities,
+                      viewStateCallback: changeViewState,
+                    ),
                     SizedBox(width: 20),
                     Totals(allActivities: _activities),
                   ],
@@ -370,17 +311,21 @@ class _HomeState extends State<Home> {
                 SizedBox(
                   height: 20,
                 ),
-                !calendarView
-                    ? MapView(
-                        key: mapViewKey,
-                        allactivities: _allactivities,
-                      )
-                    : CalendarView(
-                        activityDurations: _activityDurations,
-                        allActivities: _activities,
-                        YEAR: YEAR,
-                        columns: true,
-                      ),
+                switch (viewState) {
+                  TreenixView.Calendar => CalendarView(
+                      activityDurations: _activityDurations,
+                      allActivities: _activities,
+                      YEAR: YEAR,
+                      columns: true,
+                    ),
+                  TreenixView.Map => MapView(
+                      key: mapViewKey,
+                      allactivities: _allactivities,
+                    ),
+                  TreenixView.JGraph => JindexGraph(
+                      activities: _activities,
+                    ),
+                }
               ],
             ),
           ),
@@ -394,137 +339,126 @@ class _HomeState extends State<Home> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
+                      height: 170,
+                      width: (MediaQuery.of(context).size.width - 40) / 3,
+                      child: Yearselector(
+                        YEAR: YEAR,
+                        setYearCallback: setYear,
+                        viewStateCallback: changeViewState,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Container(
+                      height: 170,
+                      width: (MediaQuery.of(context).size.width - 40) / 3,
+                      child: TreenixStreak(
+                        allActivities: _activities,
+                        viewStateCallback: changeViewState,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Container(
+                      height: 170,
+                      width: (MediaQuery.of(context).size.width - 40) / 3,
+                      child: JarlsNumber(
+                        allActivities: _activities,
+                        viewStateCallback: changeViewState,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
                 Container(
-                  height: 120,
+                  height: MediaQuery.of(context).size.height - 200,
                   width: MediaQuery.of(context).size.width - 20,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: TreenixColors.grayBackground,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
+                  child: switch (viewState) {
+                    TreenixView.Calendar => Column(
                         children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: TreenixColors.lightGray,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                YEAR = YEAR - 1;
-                              });
-                              loadYear(YEAR);
-                              // _getActivitiesThisYear();
-                            },
-                            child: Text(
-                              "-",
-                              style: TextStyle(
-                                fontSize: 40,
-                                color: TreenixColors.primaryPink,
-                              ),
-                            ),
+                          Container(
+                            height: 120,
+                            width: MediaQuery.of(context).size.width - 20,
+                            child: Totals(allActivities: _activities),
                           ),
-                          SizedBox(width: 15),
-                          Text(
-                            YEAR.toString(),
-                            style: TextStyle(
-                              fontSize: 40,
-                              color: TreenixColors.primaryPink,
-                            ),
-                          ),
-                          SizedBox(width: 15),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: TreenixColors.lightGray,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                YEAR = YEAR + 1;
-                              });
-                              loadYear(YEAR);
-                            },
-                            child: Text(
-                              "+",
-                              style: TextStyle(
-                                fontSize: 40,
-                                color: TreenixColors.primaryPink,
-                              ),
+                          SizedBox(height: 10),
+                          Container(
+                            height: MediaQuery.of(context).size.height - 330,
+                            width: MediaQuery.of(context).size.width - 20,
+                            child: CalendarView(
+                              activityDurations: _activityDurations,
+                              allActivities: _activities,
+                              YEAR: YEAR,
+                              columns: false,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: TreenixColors.lightGray,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            calendarView = !calendarView;
-                          });
-                        },
-                        child: Text(
-                          "Toggle Calendar/Map",
-                          style: TextStyle(
-                            fontSize: 25,
-                            color: TreenixColors.primaryPink,
-                          ),
-                        ),
+                    TreenixView.Map => MapView(
+                        key: mapViewKey,
+                        allactivities: _allactivities,
                       ),
-                    ],
-                  ),
+                    TreenixView.JGraph => JindexGraph(
+                        activities: _activities,
+                      ),
+                  },
                 ),
-                SizedBox(height: 10),
-                if (!calendarView) ...[
-                  Container(
-                    height: MediaQuery.of(context).size.height - 150,
-                    width: MediaQuery.of(context).size.width - 20,
-                    child: MapView(
-                      key: mapViewKey,
-                      allactivities: _allactivities,
-                    ),
-                  )
-                ] else ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Container(
-                        // height: 140,
-                        width: (MediaQuery.of(context).size.width - 30) / 2,
-                        child: TreenixStreak(allActivities: _activities),
-                      ),
-                      SizedBox(width: 10),
-                      Container(
-                        // height: 140,
-                        width: (MediaQuery.of(context).size.width - 30) / 2,
-                        child: JarlsNumber(allActivities: _activities),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    height: 120,
-                    width: MediaQuery.of(context).size.width - 20,
-                    child: Totals(allActivities: _activities),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    height: MediaQuery.of(context).size.height - 460,
-                    width: MediaQuery.of(context).size.width - 20,
-                    child: CalendarView(
-                      activityDurations: _activityDurations,
-                      allActivities: _activities,
-                      YEAR: YEAR,
-                      columns: false,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                ]
+
+                // if (!calendarView) ...[
+                //   Container(
+                //     height: MediaQuery.of(context).size.height - 150,
+                //     width: MediaQuery.of(context).size.width - 20,
+                //     child: MapView(
+                //       key: mapViewKey,
+                //       allactivities: _allactivities,
+                //     ),
+                //   )
+                // ] else ...[
+                //   Row(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     mainAxisSize: MainAxisSize.max,
+                //     children: [
+                //       // Container(
+                //       //   // height: 140,
+                //       //   width: (MediaQuery.of(context).size.width - 30) / 2,
+                //       //   child: TreenixStreak(
+                //       //     allActivities: _activities,
+                //       //     viewStateCallback: changeViewState,
+                //       //   ),
+                //       // ),
+                //       // SizedBox(width: 10),
+                //       // Container(
+                //       //   // height: 140,
+                //       //   width: (MediaQuery.of(context).size.width - 30) / 2,
+                //       //   child: JarlsNumber(
+                //       //     allActivities: _activities,
+                //       //     viewStateCallback: changeViewState,
+                //       //   ),
+                //       // ),
+                //     ],
+
+                //     SizedBox(height: 10),
+                //     Container(
+                //       height: 120,
+                //       width: MediaQuery.of(context).size.width - 20,
+                //       child: Totals(allActivities: _activities),
+                //     ),
+                //     SizedBox(height: 10),
+                //     Container(
+                //       height: MediaQuery.of(context).size.height - 460,
+                //       width: MediaQuery.of(context).size.width - 20,
+                //       child: CalendarView(
+                //         activityDurations: _activityDurations,
+                //         allActivities: _activities,
+                //         YEAR: YEAR,
+                //         columns: false,
+                //       ),
+                //     ),
+                //     SizedBox(height: 10),
+                //   ]
               ],
             ),
           ),

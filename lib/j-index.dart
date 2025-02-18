@@ -1,12 +1,16 @@
 import 'package:Treenix/_colors.dart';
+import 'package:Treenix/home.dart';
 import 'package:flutter/material.dart';
 
 class JarlsNumber extends StatelessWidget {
   final List<Map<String, dynamic>>
       allActivities; // List of all activities with detailed info
 
+  final Function(TreenixView) viewStateCallback;
+
   JarlsNumber({
     required this.allActivities,
+    required this.viewStateCallback,
   });
 
   int findLargestX(List<int> items) {
@@ -60,13 +64,21 @@ class JarlsNumber extends StatelessWidget {
                 color: TreenixColors.primaryPink,
               ),
             ),
-            Text(
-              "You have $JN activities that last longer that $JN minutes",
-              style: TextStyle(
-                fontSize: 12,
-                color: TreenixColors.primaryPink,
+            ElevatedButton(
+              onPressed: () {
+                viewStateCallback(TreenixView.JGraph);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: TreenixColors.lightGray,
               ),
-            ),
+              child: Text(
+                "Graph",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: TreenixColors.primaryPink,
+                ),
+              ),
+            )
           ],
         ),
       ),

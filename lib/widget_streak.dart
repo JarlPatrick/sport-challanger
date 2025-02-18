@@ -1,11 +1,16 @@
 import 'package:Treenix/_colors.dart';
 import 'package:flutter/material.dart';
 
+import 'home.dart';
+
 class TreenixStreak extends StatelessWidget {
   final List<Map<String, dynamic>> allActivities;
 
+  final Function(TreenixView) viewStateCallback;
+
   const TreenixStreak({
     required this.allActivities,
+    required this.viewStateCallback,
   });
 
   int calculateRunningStreak(List<DateTime> runStartTimes, DateTime now) {
@@ -84,6 +89,21 @@ class TreenixStreak extends StatelessWidget {
                 color: TreenixColors.primaryPink,
               ),
             ),
+            ElevatedButton(
+              onPressed: () {
+                viewStateCallback(TreenixView.Calendar);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: TreenixColors.lightGray,
+              ),
+              child: Text(
+                "Calendar",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: TreenixColors.primaryPink,
+                ),
+              ),
+            )
           ],
         ),
       ),

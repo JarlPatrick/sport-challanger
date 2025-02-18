@@ -51,6 +51,7 @@ class MapViewState extends State<MapView> {
       }
     }
     addLinesToMap(activs);
+    // addAreas();
   }
 
   /// Haversine formula to compute distance between two LatLng points
@@ -109,6 +110,10 @@ class MapViewState extends State<MapView> {
   }
 
   void addLinesToMap(List<Map<String, dynamic>> activities) {
+    if (controller == null) {
+      print("Error: MapController is null");
+      return;
+    }
     for (var act in activities) {
       // print(act);
       String poly = act["map_polyline"];
@@ -116,10 +121,6 @@ class MapViewState extends State<MapView> {
       // print(poly);
       if (poly != "") {
         List<LatLng> langs = PolylineToLatLng(poly);
-        if (controller == null) {
-          print("Error: MapController is null");
-          return;
-        }
         if (isClosed(langs, 100.0)) {
           // 10 meters threshold
           double area = calculateEnclosedArea(langs) / (1000 * 1000);
@@ -138,6 +139,29 @@ class MapViewState extends State<MapView> {
     }
   }
 
+  // void addAreas() {
+  //   if (controller == null) {
+  //     print("Error: MapController is null");
+  //     return;
+  //   }
+  //   controller!.setTelemetryEnabled(true);
+  //   controller!.addFill(
+  //     FillOptions(
+  //       geometry: [
+  //         [
+  //           LatLng(59.437, 24.753),
+  //           LatLng(59.438, 24.755),
+  //           LatLng(59.436, 24.757),
+  //           LatLng(59.435, 24.754),
+  //           LatLng(59.437, 24.753) // Close the loop
+  //         ]
+  //       ],
+  //       fillColor: TreenixColors.primaryPink.toHexStringRGB(),
+  //       fillOpacity: 1,
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -148,6 +172,7 @@ class MapViewState extends State<MapView> {
         borderRadius: BorderRadius.circular(20),
         child: MapboxMap(
           styleString: MapboxStyles.DARK,
+          // styleString: MapboxStyles.MAPBOX_STREETS,
           initialCameraPosition: const CameraPosition(
             target:
                 // LatLng(59.46706512548259, 24.824713815561047),
