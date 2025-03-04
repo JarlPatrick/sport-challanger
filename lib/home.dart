@@ -12,6 +12,7 @@ import '_colors.dart';
 import 'api_dummy.dart';
 import 'calendar_view.dart';
 import 'j-index.dart';
+import 'mapTerraX.dart';
 import 'mapView.dart';
 import 'secret.dart';
 import 'totals.dart';
@@ -27,10 +28,11 @@ class Home extends StatefulWidget {
 
 int YEAR = 2025;
 
-enum TreenixView { Map, Calendar, JGraph }
+enum TreenixView { Map, Calendar, JGraph, Test }
 
 class _HomeState extends State<Home> {
   final GlobalKey<MapViewState> mapViewKey = GlobalKey<MapViewState>();
+  final GlobalKey<MapTerraXState> mapTerraXKey = GlobalKey<MapTerraXState>();
 
   String? accessToken;
   List<Map<String, dynamic>> _activities = [];
@@ -39,7 +41,7 @@ class _HomeState extends State<Home> {
 
   bool StravaConnected = true;
 
-  TreenixView viewState = TreenixView.Calendar;
+  TreenixView viewState = TreenixView.Test;
 
   @override
   void initState() {
@@ -121,6 +123,7 @@ class _HomeState extends State<Home> {
       }
     }
     mapViewKey.currentState?.loadYear(year);
+    mapTerraXKey.currentState?.loadYear(year);
     setState(() {
       _activities = activities;
     });
@@ -325,6 +328,10 @@ class _HomeState extends State<Home> {
                   TreenixView.JGraph => JindexGraph(
                       activities: _activities,
                     ),
+                  TreenixView.Test => MapTerraX(
+                      key: mapTerraXKey,
+                      allactivities: _allactivities,
+                    ),
                 }
               ],
             ),
@@ -404,61 +411,9 @@ class _HomeState extends State<Home> {
                     TreenixView.JGraph => JindexGraph(
                         activities: _activities,
                       ),
+                    TreenixView.Test => Placeholder(),
                   },
                 ),
-
-                // if (!calendarView) ...[
-                //   Container(
-                //     height: MediaQuery.of(context).size.height - 150,
-                //     width: MediaQuery.of(context).size.width - 20,
-                //     child: MapView(
-                //       key: mapViewKey,
-                //       allactivities: _allactivities,
-                //     ),
-                //   )
-                // ] else ...[
-                //   Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     mainAxisSize: MainAxisSize.max,
-                //     children: [
-                //       // Container(
-                //       //   // height: 140,
-                //       //   width: (MediaQuery.of(context).size.width - 30) / 2,
-                //       //   child: TreenixStreak(
-                //       //     allActivities: _activities,
-                //       //     viewStateCallback: changeViewState,
-                //       //   ),
-                //       // ),
-                //       // SizedBox(width: 10),
-                //       // Container(
-                //       //   // height: 140,
-                //       //   width: (MediaQuery.of(context).size.width - 30) / 2,
-                //       //   child: JarlsNumber(
-                //       //     allActivities: _activities,
-                //       //     viewStateCallback: changeViewState,
-                //       //   ),
-                //       // ),
-                //     ],
-
-                //     SizedBox(height: 10),
-                //     Container(
-                //       height: 120,
-                //       width: MediaQuery.of(context).size.width - 20,
-                //       child: Totals(allActivities: _activities),
-                //     ),
-                //     SizedBox(height: 10),
-                //     Container(
-                //       height: MediaQuery.of(context).size.height - 460,
-                //       width: MediaQuery.of(context).size.width - 20,
-                //       child: CalendarView(
-                //         activityDurations: _activityDurations,
-                //         allActivities: _activities,
-                //         YEAR: YEAR,
-                //         columns: false,
-                //       ),
-                //     ),
-                //     SizedBox(height: 10),
-                //   ]
               ],
             ),
           ),

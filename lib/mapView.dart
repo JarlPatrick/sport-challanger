@@ -54,56 +54,6 @@ class MapViewState extends State<MapView> {
     // addAreas();
   }
 
-  /// Haversine formula to compute distance between two LatLng points
-  double haversineDistance(LatLng p1, LatLng p2) {
-    const double R = 6371000; // Earth radius in meters
-    double lat1 = radians(p1.latitude);
-    double lon1 = radians(p1.longitude);
-    double lat2 = radians(p2.latitude);
-    double lon2 = radians(p2.longitude);
-
-    double dLat = lat2 - lat1;
-    double dLon = lon2 - lon1;
-
-    double a =
-        pow(sin(dLat / 2), 2) + cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-
-    return R * c;
-  }
-
-  /// Check if the polyline is closed
-  bool isClosed(List<LatLng> points, double thresholdMeters) {
-    if (points.length < 3) return false;
-
-    double distance = haversineDistance(points.first, points.last);
-    return distance < thresholdMeters;
-  }
-
-  /// Compute the enclosed area using the Shoelace formula
-  double calculateEnclosedArea(List<LatLng> points) {
-    if (points.length < 3) return 0.0; // Not a polygon
-
-    double sum = 0.0;
-    for (int i = 0; i < points.length - 1; i++) {
-      sum += (points[i].longitude * points[i + 1].latitude) -
-          (points[i + 1].longitude * points[i].latitude);
-    }
-
-    // Closing segment
-    sum += (points.last.longitude * points.first.latitude) -
-        (points.first.longitude * points.last.latitude);
-
-    return (sum.abs() / 2.0) *
-        111319.9 *
-        111319.9; // Convert degrees to square meters
-  }
-
-  /// Convert degrees to radians
-  double radians(double degrees) {
-    return degrees * pi / 180;
-  }
-
   List<LatLng> PolylineToLatLng(String polyline) {
     List<List<num>> points = PolylineCodec.decode(polyline);
     return points.map((p) => LatLng(p[0].toDouble(), p[1].toDouble())).toList();
@@ -121,13 +71,13 @@ class MapViewState extends State<MapView> {
       // print(poly);
       if (poly != "") {
         List<LatLng> langs = PolylineToLatLng(poly);
-        if (isClosed(langs, 100.0)) {
-          // 10 meters threshold
-          double area = calculateEnclosedArea(langs) / (1000 * 1000);
-          // print("Enclosed Area: ${area.toStringAsFixed(1)} km^2");
-        } else {
-          // print("The polyline is not closed.");
-        }
+        // if (isClosed(langs, 100.0)) {
+        //   // 10 meters threshold
+        //   double area = calculateEnclosedArea(langs) / (1000 * 1000);
+        //   // print("Enclosed Area: ${area.toStringAsFixed(1)} km^2");
+        // } else {
+        //   // print("The polyline is not closed.");
+        // }
         controller!.addLine(
           LineOptions(
             geometry: langs!,
