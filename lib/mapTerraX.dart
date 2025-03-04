@@ -1,8 +1,10 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'dart:convert';
 import 'package:polyline_codec/polyline_codec.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 import '_colors.dart';
 
@@ -31,10 +33,77 @@ class MapTerraXState extends State<MapTerraX> {
     this.controller = controller;
   }
 
+  Future<String> getToken() async {
+    final result = await Amplify.Auth.fetchAuthSession();
+    // print(result);
+    // print("");
+    var a = result.toString().split("idToken")[1];
+    var b = a.split('"')[2];
+    var token = b.split('\"')[0];
+    return token;
+  }
+
+  List<List<double>> parseGeoJsonFromList(String jsonResponse) {
+    // Decode the entire response (assuming it's a JSON array)
+    List<dynamic> decodedList = jsonDecode(jsonResponse);
+
+    if (decodedList.isNotEmpty && decodedList[0]['geojson'] != null) {
+      // Extract the actual GeoJSON object
+      Map<String, dynamic> geoJsonMap = decodedList[0]['geojson'];
+
+      if (geoJsonMap['type'] == 'MultiPolygon' &&
+          geoJsonMap['coordinates'] != null) {
+        print("something");
+        List<List<double>> coordinates = [];
+
+        // Iterate through MultiPolygon structure
+        for (var polygon in geoJsonMap['coordinates']) {
+          for (var ring in polygon) {
+            for (var point in ring) {
+              // Convert [longitude, latitude] to [latitude, longitude]
+              coordinates.add([point[1], point[0]]);
+            }
+          }
+        }
+
+        return coordinates;
+      }
+    }
+    return [];
+  }
+
   void _onStyleLoaded() async {
     if (controller == null) return;
 
     loadYear(2025);
+
+    String lambdaUrl =
+        "https://6iks67rav1.execute-api.eu-north-1.amazonaws.com/default/request-areas";
+    String token = await getToken();
+
+    final response = await http.get(
+      Uri.parse(lambdaUrl),
+      headers: <String, String>{
+        "Authorization": token,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      // print(response.body);
+      // final Map<String, dynamic> geoJson = jsonDecode(data[0]["geojson"]);
+      List<List<double>> a = parseGeoJsonFromList(response.body);
+      // print(data);
+      // print(a);
+      // List<dynamic> coordinatelist = geoJson["coordinates"]; //["coordinates"]);
+      // for (var loop in coordinatelist) {
+      //   print(loop.length);
+      //   print(loop);
+      //   //  return coordinates.map((point) {
+      //   //   return LatLng(point[1], point[0]); // GeoJSON uses [lon, lat], so swap
+      //   // }).toList();
+      // }
+    }
   }
 
   void loadYear(int year) {
