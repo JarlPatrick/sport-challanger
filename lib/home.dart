@@ -28,7 +28,7 @@ class Home extends StatefulWidget {
 
 int YEAR = 2025;
 
-enum TreenixView { Map, Calendar, JGraph, Test }
+enum TreenixView { Map, Calendar, JGraph }
 
 class _HomeState extends State<Home> {
   final GlobalKey<MapViewState> mapViewKey = GlobalKey<MapViewState>();
@@ -41,7 +41,7 @@ class _HomeState extends State<Home> {
 
   bool StravaConnected = true;
 
-  TreenixView viewState = TreenixView.Test;
+  TreenixView viewState = TreenixView.Calendar;
 
   @override
   void initState() {
@@ -123,7 +123,7 @@ class _HomeState extends State<Home> {
       }
     }
     mapViewKey.currentState?.loadYear(year);
-    mapTerraXKey.currentState?.loadYear(year);
+    // mapTerraXKey.currentState?.loadYear(year);
     setState(() {
       _activities = activities;
     });
@@ -328,10 +328,10 @@ class _HomeState extends State<Home> {
                   TreenixView.JGraph => JindexGraph(
                       activities: _activities,
                     ),
-                  TreenixView.Test => MapTerraX(
-                      key: mapTerraXKey,
-                      allactivities: _allactivities,
-                    ),
+                  // TreenixView.Test => MapTerraX(
+                  //     key: mapTerraXKey,
+                  //     allactivities: _allactivities,
+                  //   ),
                 }
               ],
             ),
@@ -411,7 +411,7 @@ class _HomeState extends State<Home> {
                     TreenixView.JGraph => JindexGraph(
                         activities: _activities,
                       ),
-                    TreenixView.Test => Placeholder(),
+                    // TreenixView.Test => Placeholder(),
                   },
                 ),
               ],
