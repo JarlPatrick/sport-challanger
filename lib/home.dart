@@ -1,5 +1,6 @@
 import 'package:Treenix/j-indexGraph.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'dart:convert';
@@ -306,6 +307,33 @@ class _HomeState extends State<Home> {
                     JarlsNumber(
                       allActivities: _activities,
                       viewStateCallback: changeViewState,
+                    ),
+                    SizedBox(width: 20),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Material(
+                        color: TreenixColors.grayBackground,
+                        child: InkWell(
+                          hoverColor: TreenixColors.primaryPink,
+                          onTap: () {
+                            GoRouter.of(context).go('/terrax');
+                          },
+                          child: Container(
+                            width: 100,
+                            height: 160,
+                            padding: EdgeInsets.all(10),
+                            child: Center(
+                              child: Text(
+                                "TERRAX",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     SizedBox(width: 20),
                     Totals(allActivities: _activities),
