@@ -1,6 +1,7 @@
 import 'dart:ui_web';
 
 import 'package:Treenix/mapTerraX.dart';
+import 'package:Treenix/mapheatmap.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -61,6 +62,11 @@ class _MainAppState extends State<MainApp> {
               path: '/terrax',
               // builder: (context, state) => StravaAuthPage(),
               builder: (context, state) => MapTerraX(),
+            ),
+            GoRoute(
+              path: '/heatmap',
+              // builder: (context, state) => StravaAuthPage(),
+              builder: (context, state) => MapHeatmap(),
             ),
             // GoRoute(
             //   path: "/home",

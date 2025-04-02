@@ -14,18 +14,18 @@ class TreenixStreak extends StatelessWidget {
   });
 
   int calculateRunningStreak(List<DateTime> runStartTimes, DateTime now) {
-    // Normalize the 'now' DateTime to just the date (no time part)
-    DateTime today = DateTime(now.year, now.month, now.day);
+    // Convert 'now' to UTC and normalize to remove the time part
+    DateTime today = DateTime.utc(now.year, now.month, now.day);
 
-    // Sort the list in descending order
-    runStartTimes.sort((a, b) => b.compareTo(a));
-
-    // Normalize all dates in the list to remove the time part
+    // Convert all dates to UTC and normalize them
     List<DateTime> normalizedDates = runStartTimes
-        .map((date) => DateTime(date.year, date.month, date.day))
+        .map((date) => DateTime.utc(
+            date.toUtc().year, date.toUtc().month, date.toUtc().day))
         .toSet() // Remove duplicates (same day runs)
         .toList()
       ..sort((a, b) => b.compareTo(a));
+
+    // print(normalizedDates);
 
     int streak = 0;
 
@@ -60,7 +60,7 @@ class TreenixStreak extends StatelessWidget {
     DateTime today = DateTime.now();
 
     int streak = calculateRunningStreak(allDates, today);
-    print("Streak $streak");
+    // print("Streak $streak");
 
     return Container(
       height: 160,

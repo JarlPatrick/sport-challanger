@@ -130,72 +130,72 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Future<void> _getActivitiesThisYear() async {
-    getActivities();
-    List<Map<String, dynamic>> activitiesThisYear = [];
-    // for (var activity in _) return;
-    final currentYear = DateTime(YEAR).year; //DateTime.now().year;
-    final startDate = DateTime(currentYear, 1, 1).millisecondsSinceEpoch ~/
-        1000; // Unix timestamp for Jan 1st
-    final endDate =
-        DateTime(currentYear + 1, 1, 1).millisecondsSinceEpoch ~/ 1000;
-    print(startDate);
-    const int perPage = 100; // Number of activities to fetch per page
-    int page = 1;
-    bool hasMoreActivities = true;
+  // Future<void> _getActivitiesThisYear() async {
+  //   getActivities();
+  //   List<Map<String, dynamic>> activitiesThisYear = [];
+  //   // for (var activity in _) return;
+  //   final currentYear = DateTime(YEAR).year; //DateTime.now().year;
+  //   final startDate = DateTime(currentYear, 1, 1).millisecondsSinceEpoch ~/
+  //       1000; // Unix timestamp for Jan 1st
+  //   final endDate =
+  //       DateTime(currentYear + 1, 1, 1).millisecondsSinceEpoch ~/ 1000;
+  //   print(startDate);
+  //   const int perPage = 100; // Number of activities to fetch per page
+  //   int page = 1;
+  //   bool hasMoreActivities = true;
 
-    Map<DateTime, bool> activityDurations = {};
-    List<Map<String, dynamic>> allactivities = [];
+  //   Map<DateTime, bool> activityDurations = {};
+  //   List<Map<String, dynamic>> allactivities = [];
 
-    while (hasMoreActivities) {
-      final url = Uri.parse(
-          'https://www.strava.com/api/v3/athlete/activities?after=$startDate&before=$endDate&per_page=$perPage&page=$page');
-      final response = await http.get(
-        url,
-        headers: {'Authorization': 'Bearer $accessToken'},
-      );
+  //   while (hasMoreActivities) {
+  //     final url = Uri.parse(
+  //         'https://www.strava.com/api/v3/athlete/activities?after=$startDate&before=$endDate&per_page=$perPage&page=$page');
+  //     final response = await http.get(
+  //       url,
+  //       headers: {'Authorization': 'Bearer $accessToken'},
+  //     );
 
-      if (response.statusCode == 200) {
-        final activities = jsonDecode(response.body) as List;
-        // if (true) {
-        //   final activities = apireturn;
-        //   hasMoreActivities = false;
-        //   print(activities);
-        if (activities.isEmpty) {
-          hasMoreActivities = false;
-        } else {
-          for (var activity in activities) {
-            allactivities.add(activity);
-            final parsedDate = DateTime.parse(activity['start_date']);
-            final normalizedDate =
-                DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
-            final durationSeconds = activity['moving_time'];
-            final isLongActivity = durationSeconds > 20 * 60; // 20 minutes
+  //     if (response.statusCode == 200) {
+  //       final activities = jsonDecode(response.body) as List;
+  //       // if (true) {
+  //       //   final activities = apireturn;
+  //       //   hasMoreActivities = false;
+  //       //   print(activities);
+  //       if (activities.isEmpty) {
+  //         hasMoreActivities = false;
+  //       } else {
+  //         for (var activity in activities) {
+  //           allactivities.add(activity);
+  //           final parsedDate = DateTime.parse(activity['start_date']);
+  //           final normalizedDate =
+  //               DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
+  //           final durationSeconds = activity['moving_time'];
+  //           final isLongActivity = durationSeconds > 20 * 60; // 20 minutes
 
-            if (activityDurations.containsKey(normalizedDate)) {
-              activityDurations[normalizedDate] =
-                  activityDurations[normalizedDate]! || isLongActivity;
-            } else {
-              activityDurations[normalizedDate] = isLongActivity;
-            }
-          }
-          page++; // Increment page to fetch the next set of activities
-        }
-      } else {
-        print('Failed to fetch activities: ${response.body}');
-        hasMoreActivities = false; // Stop fetching on error
-      }
-    }
+  //           if (activityDurations.containsKey(normalizedDate)) {
+  //             activityDurations[normalizedDate] =
+  //                 activityDurations[normalizedDate]! || isLongActivity;
+  //           } else {
+  //             activityDurations[normalizedDate] = isLongActivity;
+  //           }
+  //         }
+  //         page++; // Increment page to fetch the next set of activities
+  //       }
+  //     } else {
+  //       print('Failed to fetch activities: ${response.body}');
+  //       hasMoreActivities = false; // Stop fetching on error
+  //     }
+  //   }
 
-    print(allactivities.length);
+  //   print(allactivities.length);
 
-    setState(() {
-      _activityDurations = activityDurations;
-      _activities = allactivities;
-    });
+  //   setState(() {
+  //     _activityDurations = activityDurations;
+  //     _activities = allactivities;
+  //   });
 
-    // addLinesToMap(allactivities);
-  }
+  //   // addLinesToMap(allactivities);
+  // }
 
   Future<void> getActivities() async {
     try {
@@ -307,6 +307,33 @@ class _HomeState extends State<Home> {
                     JarlsNumber(
                       allActivities: _activities,
                       viewStateCallback: changeViewState,
+                    ),
+                    SizedBox(width: 20),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Material(
+                        color: TreenixColors.grayBackground,
+                        child: InkWell(
+                          hoverColor: TreenixColors.primaryPink,
+                          onTap: () {
+                            GoRouter.of(context).go('/heatmap');
+                          },
+                          child: Container(
+                            width: 120,
+                            height: 160,
+                            padding: EdgeInsets.all(10),
+                            child: Center(
+                              child: Text(
+                                "HEATMAP",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     SizedBox(width: 20),
                     ClipRRect(
