@@ -79,21 +79,21 @@ class Yearselector extends StatelessWidget {
             ],
           ),
           SizedBox(height: 10),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: TreenixColors.lightGray,
-            ),
-            onPressed: () {
-              viewStateCallback(TreenixView.Map);
-            },
-            child: Text(
-              "Map",
-              style: TextStyle(
-                fontSize: 13,
-                color: TreenixColors.primaryPink,
-              ),
-            ),
-          ),
+          // ElevatedButton(
+          //   style: ElevatedButton.styleFrom(
+          //     backgroundColor: TreenixColors.lightGray,
+          //   ),
+          //   onPressed: () {
+          //     viewStateCallback(TreenixView.Map);
+          //   },
+          //   child: Text(
+          //     "Map",
+          //     style: TextStyle(
+          //       fontSize: 13,
+          //       color: TreenixColors.primaryPink,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

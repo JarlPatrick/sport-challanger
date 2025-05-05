@@ -55,58 +55,100 @@ class TreenixStreak extends StatelessWidget {
   Widget build(BuildContext context) {
     List<DateTime> allDates = [];
     for (var activity in allActivities) {
-      allDates.add(DateTime.parse(activity['start_date']));
+      if (activity['elapsed_time'] > 20 * 60) {
+        allDates.add(DateTime.parse(activity['start_date']));
+      }
     }
     DateTime today = DateTime.now();
 
     int streak = calculateRunningStreak(allDates, today);
     // print("Streak $streak");
 
-    return Container(
-      height: 160,
-      width: 200,
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Material(
         color: TreenixColors.grayBackground,
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Text(
-              "Streak",
-              style: TextStyle(
-                fontSize: 20,
-                color: TreenixColors.primaryPink,
+        child: InkWell(
+          hoverColor: TreenixColors.primaryPink,
+          onTap: () {
+            viewStateCallback(TreenixView.Calendar);
+          },
+          child: Container(
+            width: 120,
+            height: 160,
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Text(
+                    "Streak",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    streak.toString(),
+                    style: TextStyle(
+                      fontSize: 50,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-            Text(
-              streak.toString(),
-              style: TextStyle(
-                fontSize: 50,
-                color: TreenixColors.primaryPink,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                viewStateCallback(TreenixView.Calendar);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: TreenixColors.lightGray,
-              ),
-              child: Text(
-                "Calendar",
-                style: TextStyle(
-                  fontSize: 13,
-                  color: TreenixColors.primaryPink,
-                ),
-              ),
-            )
-          ],
+          ),
         ),
       ),
     );
+
+    // Container(
+    //   height: 160,
+    //   width: 200,
+    //   padding: EdgeInsets.all(10),
+    //   decoration: BoxDecoration(
+    //     borderRadius: BorderRadius.circular(10),
+    //     color: TreenixColors.grayBackground,
+    //   ),
+    //   child: Center(
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       mainAxisSize: MainAxisSize.max,
+    //       children: [
+    //         Text(
+    //           "Streak",
+    //           style: TextStyle(
+    //             fontSize: 20,
+    //             color: TreenixColors.primaryPink,
+    //           ),
+    //         ),
+    //         Text(
+    //           streak.toString(),
+    //           style: TextStyle(
+    //             fontSize: 50,
+    //             color: TreenixColors.primaryPink,
+    //           ),
+    //         ),
+    //         ElevatedButton(
+    //           onPressed: () {
+    //             viewStateCallback(TreenixView.Calendar);
+    //           },
+    //           style: ElevatedButton.styleFrom(
+    //             backgroundColor: TreenixColors.lightGray,
+    //           ),
+    //           child: Text(
+    //             "Calendar",
+    //             style: TextStyle(
+    //               fontSize: 13,
+    //               color: TreenixColors.primaryPink,
+    //             ),
+    //           ),
+    //         )
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }

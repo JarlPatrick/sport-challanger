@@ -3,13 +3,15 @@ import '_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class JindexGraph extends StatelessWidget {
-  final List<Map<String, dynamic>> activities;
+  final List<Map<String, dynamic>> allactivities;
+  final int year;
   const JindexGraph({
     super.key,
-    required this.activities,
+    required this.allactivities,
+    required this.year,
   });
 
-  List<List<int>> findJindexGraph() {
+  List<List<int>> findJindexGraph(List<Map<String, dynamic>> activities) {
     List<int> Times = [];
     for (var activity in activities) {
       int durationSeconds = activity['moving_time'] ~/ 60;
@@ -33,7 +35,7 @@ class JindexGraph extends StatelessWidget {
     return points.entries.map((e) => [e.key, e.value]).toList();
   }
 
-  int findLargestX() {
+  int findLargestX(List<Map<String, dynamic>> activities) {
     List<int> items = [];
     for (var activity in activities) {
       int durationSeconds = activity['moving_time'] ~/ 60;
@@ -56,8 +58,28 @@ class JindexGraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<List<int>> points = findJindexGraph();
-    int JN = findLargestX();
+    List<List<int>> points = findJindexGraph(allactivities);
+    int JN = findLargestX(allactivities);
+    List<Map<String, dynamic>> thisYearActivities = [];
+    List<Map<String, dynamic>> lastYearActivities = [];
+    List<Map<String, dynamic>> lastQuarterActivities = [];
+    for (var activity in allactivities) {
+      int durationSeconds = activity['moving_time'] ~/ 60;
+      // AllTimes.add(durationSeconds);
+      final parsedDate = DateTime.parse(activity['start_date']);
+      if (parsedDate.year == year) {
+        thisYearActivities.add(activity);
+      }
+      if (DateTime.now().difference(parsedDate).inDays < 365) {
+        lastYearActivities.add(activity);
+      }
+      if (DateTime.now().difference(parsedDate).inDays < 90) {
+        lastQuarterActivities.add(activity);
+      }
+    }
+    List<List<int>> points2 = findJindexGraph(thisYearActivities);
+    List<List<int>> points3 = findJindexGraph(lastYearActivities);
+    List<List<int>> points4 = findJindexGraph(lastQuarterActivities);
     return Container(
       height: 600,
       width: 1600,
@@ -73,10 +95,10 @@ class JindexGraph extends StatelessWidget {
           Container(
             padding: EdgeInsets.only(left: 30, right: 30),
             child: Text(
-              "Your J-index is $JN, that means you have $JN activities that last longer that $JN minutes",
+              "Your All Time J-index is $JN, that means you have $JN activities that last longer that $JN minutes",
               style: TextStyle(
                 fontSize: 20,
-                color: TreenixColors.primaryPink,
+                color: Colors.white,
               ),
             ),
           ),
@@ -90,7 +112,7 @@ class JindexGraph extends StatelessWidget {
                 titlesData: FlTitlesData(
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
-                      interval: 10,
+                      // interval: 10,
                       showTitles: true,
                       reservedSize: 30,
                       getTitlesWidget: (value, meta) {
@@ -105,7 +127,7 @@ class JindexGraph extends StatelessWidget {
                     ),
                     axisNameSize: 40,
                     axisNameWidget: Text(
-                      "Nr o Activities",
+                      "Nr of Activities",
                       style: TextStyle(
                         color: TreenixColors.lightGray,
                         fontSize: 22,
@@ -114,7 +136,7 @@ class JindexGraph extends StatelessWidget {
                   ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
-                      interval: 10,
+                      // interval: 10,
                       showTitles: true,
                       reservedSize: 30,
                       getTitlesWidget: (value, meta) {
@@ -150,7 +172,49 @@ class JindexGraph extends StatelessWidget {
                   LineChartBarData(
                     spots: [
                       for (var point in points)
-                        FlSpot(point[0].toDouble(), point[1].toDouble()),
+                        FlSpot(
+                          point[0].toDouble(),
+                          point[1].toDouble(),
+                        ),
+                    ],
+                    // isCurved: false,
+                    color: TreenixColors.primaryPink,
+                    barWidth: 3,
+                    belowBarData: BarAreaData(show: false),
+                  ),
+                  LineChartBarData(
+                    spots: [
+                      for (var point in points2)
+                        FlSpot(
+                          point[0].toDouble(),
+                          point[1].toDouble(),
+                        ),
+                    ],
+                    // isCurved: false,
+                    color: TreenixColors.primaryPink,
+                    barWidth: 3,
+                    belowBarData: BarAreaData(show: false),
+                  ),
+                  LineChartBarData(
+                    spots: [
+                      for (var point in points3)
+                        FlSpot(
+                          point[0].toDouble(),
+                          point[1].toDouble(),
+                        ),
+                    ],
+                    // isCurved: false,
+                    color: TreenixColors.primaryPink,
+                    barWidth: 3,
+                    belowBarData: BarAreaData(show: false),
+                  ),
+                  LineChartBarData(
+                    spots: [
+                      for (var point in points4)
+                        FlSpot(
+                          point[0].toDouble(),
+                          point[1].toDouble(),
+                        ),
                     ],
                     // isCurved: false,
                     color: TreenixColors.primaryPink,

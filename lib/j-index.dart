@@ -7,10 +7,12 @@ class JarlsNumber extends StatelessWidget {
       allActivities; // List of all activities with detailed info
 
   final Function(TreenixView) viewStateCallback;
+  final int year;
 
   JarlsNumber({
     required this.allActivities,
     required this.viewStateCallback,
+    required this.year,
   });
 
   int findLargestX(List<int> items) {
@@ -31,57 +33,177 @@ class JarlsNumber extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<int> Times = [];
+    List<int> AllTimes = [];
+    List<int> ThisYearTimes = [];
+    List<int> LastYearTimes = [];
+    List<int> LastQuarterTimes = [];
     for (var activity in allActivities) {
       int durationSeconds = activity['moving_time'] ~/ 60;
-      Times.add(durationSeconds);
+      AllTimes.add(durationSeconds);
+      final parsedDate = DateTime.parse(activity['start_date']);
+      if (parsedDate.year == year) {
+        ThisYearTimes.add(durationSeconds);
+      }
+      if (DateTime.now().difference(parsedDate).inDays < 365) {
+        LastYearTimes.add(durationSeconds);
+      }
+      if (DateTime.now().difference(parsedDate).inDays < 90) {
+        LastQuarterTimes.add(durationSeconds);
+      }
     }
-    int JN = findLargestX(Times);
-    return Container(
-      height: 160,
-      width: 200,
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+    int AllTimesJN = findLargestX(AllTimes);
+    int ThisYearJN = findLargestX(ThisYearTimes);
+    int LastYearJN = findLargestX(LastYearTimes);
+    int LastQuarterJN = findLargestX(LastQuarterTimes);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Material(
         color: TreenixColors.grayBackground,
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Text(
-              "J-index",
-              style: TextStyle(
-                fontSize: 20,
-                color: TreenixColors.primaryPink,
+        child: InkWell(
+          hoverColor: TreenixColors.primaryPink,
+          onTap: () {
+            viewStateCallback(TreenixView.JGraph);
+          },
+          child: Container(
+            width: 200,
+            height: 160,
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Text(
+                    "J-INDEX",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text(
+                            AllTimesJN.toString(),
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            "ALL TIME",
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            LastYearJN.toString(),
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            "LAST 356 DAYS",
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text(
+                            ThisYearJN.toString(),
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            "YEAR $year",
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            LastQuarterJN.toString(),
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            "LAST 90 DAYS",
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            Text(
-              JN.toString(),
-              style: TextStyle(
-                fontSize: 50,
-                color: TreenixColors.primaryPink,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                viewStateCallback(TreenixView.JGraph);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: TreenixColors.lightGray,
-              ),
-              child: Text(
-                "Graph",
-                style: TextStyle(
-                  fontSize: 13,
-                  color: TreenixColors.primaryPink,
-                ),
-              ),
-            )
-          ],
+          ),
         ),
       ),
     );
+    //  Container(
+    //   height: 160,
+    //   width: 200,
+    //   padding: EdgeInsets.all(10),
+    //   decoration: BoxDecoration(
+    //     borderRadius: BorderRadius.circular(10),
+    //     color: TreenixColors.grayBackground,
+    //   ),
+    //   child: Center(
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       mainAxisSize: MainAxisSize.max,
+    //       children: [
+    //         Text(
+    //           "J-index",
+    //           style: TextStyle(
+    //             fontSize: 20,
+    //             color: TreenixColors.primaryPink,
+    //           ),
+    //         ),
+    //         Text(
+    //           JN.toString(),
+    //           style: TextStyle(
+    //             fontSize: 50,
+    //             color: TreenixColors.primaryPink,
+    //           ),
+    //         ),
+    //         ElevatedButton(
+    //           onPressed: () {
+    //             viewStateCallback(TreenixView.JGraph);
+    //           },
+    //           style: ElevatedButton.styleFrom(
+    //             backgroundColor: TreenixColors.lightGray,
+    //           ),
+    //           child: Text(
+    //             "Graph",
+    //             style: TextStyle(
+    //               fontSize: 13,
+    //               color: TreenixColors.primaryPink,
+    //             ),
+    //           ),
+    //         )
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }

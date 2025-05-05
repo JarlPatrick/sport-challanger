@@ -130,73 +130,6 @@ class _HomeState extends State<Home> {
     });
   }
 
-  // Future<void> _getActivitiesThisYear() async {
-  //   getActivities();
-  //   List<Map<String, dynamic>> activitiesThisYear = [];
-  //   // for (var activity in _) return;
-  //   final currentYear = DateTime(YEAR).year; //DateTime.now().year;
-  //   final startDate = DateTime(currentYear, 1, 1).millisecondsSinceEpoch ~/
-  //       1000; // Unix timestamp for Jan 1st
-  //   final endDate =
-  //       DateTime(currentYear + 1, 1, 1).millisecondsSinceEpoch ~/ 1000;
-  //   print(startDate);
-  //   const int perPage = 100; // Number of activities to fetch per page
-  //   int page = 1;
-  //   bool hasMoreActivities = true;
-
-  //   Map<DateTime, bool> activityDurations = {};
-  //   List<Map<String, dynamic>> allactivities = [];
-
-  //   while (hasMoreActivities) {
-  //     final url = Uri.parse(
-  //         'https://www.strava.com/api/v3/athlete/activities?after=$startDate&before=$endDate&per_page=$perPage&page=$page');
-  //     final response = await http.get(
-  //       url,
-  //       headers: {'Authorization': 'Bearer $accessToken'},
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       final activities = jsonDecode(response.body) as List;
-  //       // if (true) {
-  //       //   final activities = apireturn;
-  //       //   hasMoreActivities = false;
-  //       //   print(activities);
-  //       if (activities.isEmpty) {
-  //         hasMoreActivities = false;
-  //       } else {
-  //         for (var activity in activities) {
-  //           allactivities.add(activity);
-  //           final parsedDate = DateTime.parse(activity['start_date']);
-  //           final normalizedDate =
-  //               DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
-  //           final durationSeconds = activity['moving_time'];
-  //           final isLongActivity = durationSeconds > 20 * 60; // 20 minutes
-
-  //           if (activityDurations.containsKey(normalizedDate)) {
-  //             activityDurations[normalizedDate] =
-  //                 activityDurations[normalizedDate]! || isLongActivity;
-  //           } else {
-  //             activityDurations[normalizedDate] = isLongActivity;
-  //           }
-  //         }
-  //         page++; // Increment page to fetch the next set of activities
-  //       }
-  //     } else {
-  //       print('Failed to fetch activities: ${response.body}');
-  //       hasMoreActivities = false; // Stop fetching on error
-  //     }
-  //   }
-
-  //   print(allactivities.length);
-
-  //   setState(() {
-  //     _activityDurations = activityDurations;
-  //     _activities = allactivities;
-  //   });
-
-  //   // addLinesToMap(allactivities);
-  // }
-
   Future<void> getActivities() async {
     try {
       String lambdaUrl =
@@ -213,31 +146,13 @@ class _HomeState extends State<Home> {
       if (response.statusCode == 200) {
         final activities = jsonDecode(response.body);
 
-        Map<DateTime, bool> activityDurations = {};
         List<Map<String, dynamic>> allactivities = [];
-
         for (var activity in activities) {
           allactivities.add(activity);
-          final parsedDate = DateTime.parse(activity['start_date']);
-          // print(parsedDate);
-          final normalizedDate =
-              DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
-          final durationSeconds = activity['moving_time'];
-          // print(durationSeconds);
-          final isLongActivity = durationSeconds > 20 * 60; // 20 minutes
-
-          if (activityDurations.containsKey(normalizedDate)) {
-            activityDurations[normalizedDate] =
-                activityDurations[normalizedDate]! || isLongActivity;
-          } else {
-            activityDurations[normalizedDate] = isLongActivity;
-          }
         }
-
         print(allactivities.length);
 
         setState(() {
-          _activityDurations = activityDurations;
           _allactivities = allactivities;
         });
         loadYear(YEAR);
@@ -305,9 +220,11 @@ class _HomeState extends State<Home> {
                     SizedBox(width: 20),
                     // ],
                     JarlsNumber(
-                      allActivities: _activities,
+                      allActivities: _allactivities,
                       viewStateCallback: changeViewState,
+                      year: YEAR,
                     ),
+
                     SizedBox(width: 20),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
@@ -371,7 +288,7 @@ class _HomeState extends State<Home> {
                 ),
                 switch (viewState) {
                   TreenixView.Calendar => CalendarView(
-                      activityDurations: _activityDurations,
+                      // activityDurations: _activityDurations,
                       allActivities: _activities,
                       YEAR: YEAR,
                       columns: true,
@@ -381,7 +298,8 @@ class _HomeState extends State<Home> {
                       allactivities: _allactivities,
                     ),
                   TreenixView.JGraph => JindexGraph(
-                      activities: _activities,
+                      allactivities: _allactivities,
+                      year: YEAR,
                     ),
                   // TreenixView.Test => MapTerraX(
                   //     key: mapTerraXKey,
@@ -417,19 +335,20 @@ class _HomeState extends State<Home> {
                     SizedBox(width: 10),
                     Container(
                       height: 170,
-                      width: (MediaQuery.of(context).size.width - 40) / 3,
+                      width: (MediaQuery.of(context).size.width - 40) / 3 - 30,
                       child: TreenixStreak(
-                        allActivities: _activities,
+                        allActivities: _allactivities,
                         viewStateCallback: changeViewState,
                       ),
                     ),
                     SizedBox(width: 10),
                     Container(
                       height: 170,
-                      width: (MediaQuery.of(context).size.width - 40) / 3,
+                      width: (MediaQuery.of(context).size.width - 40) / 3 + 30,
                       child: JarlsNumber(
-                        allActivities: _activities,
+                        allActivities: _allactivities,
                         viewStateCallback: changeViewState,
+                        year: YEAR,
                       ),
                     ),
                   ],
@@ -451,7 +370,6 @@ class _HomeState extends State<Home> {
                             height: MediaQuery.of(context).size.height - 330,
                             width: MediaQuery.of(context).size.width - 20,
                             child: CalendarView(
-                              activityDurations: _activityDurations,
                               allActivities: _activities,
                               YEAR: YEAR,
                               columns: false,
@@ -464,7 +382,8 @@ class _HomeState extends State<Home> {
                         allactivities: _allactivities,
                       ),
                     TreenixView.JGraph => JindexGraph(
-                        activities: _activities,
+                        allactivities: _allactivities,
+                        year: YEAR,
                       ),
                     // TreenixView.Test => Placeholder(),
                   },

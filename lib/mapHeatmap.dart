@@ -8,6 +8,7 @@ import 'package:polyline_codec/polyline_codec.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:flutter_map/flutter_map.dart';
+import 'dart:html' as html;
 
 import '_colors.dart';
 
@@ -56,6 +57,7 @@ class MapHeatmapState extends State<MapHeatmap> {
     );
 
     if (response.statusCode == 200) {
+      print("LOADED");
       final activities = jsonDecode(response.body);
 
       List<Map<String, dynamic>> allactivities = [];
@@ -93,6 +95,10 @@ class MapHeatmapState extends State<MapHeatmap> {
         .toList();
   }
 
+  final LayerHitNotifier hitNotifier = ValueNotifier(null);
+  String activityName = "";
+  String stravaID = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,6 +114,7 @@ class MapHeatmapState extends State<MapHeatmap> {
                 // initialCenter:
                 //     LatLng(51.509364, -0.128928), // Center the map over London
                 initialZoom: 8,
+                onTap: (tapPosition, point) {},
               ),
               children: [
                 TileLayer(
@@ -118,17 +125,55 @@ class MapHeatmapState extends State<MapHeatmap> {
                   subdomains: ['a', 'b', 'c'],
                   userAgentPackageName: 'com.example.app',
                 ),
-                PolylineLayer(
-                  polylines: [
-                    for (var act in _allactivities)
-                      if (DateTime.parse(act['start_date']).isBefore(endDate) &&
-                          DateTime.parse(act['start_date']).isAfter(startDate))
-                        Polyline(
-                          points: PolylineToLatLng(act["map_polyline"]),
-                          color: TreenixColors.primaryPink,
-                        )
-                  ],
+                // Inside the map build...
+                MouseRegion(
+                  hitTestBehavior: HitTestBehavior.deferToChild,
+                  cursor: SystemMouseCursors
+                      .click, // Use a special cursor to indicate interactivity
+                  child: GestureDetector(
+                    onTap: () {
+                      print("hit");
+                      print(hitNotifier.value?.hitValues);
+                      int id = hitNotifier.value!.hitValues.first as int;
+
+                      setState(() {
+                        activityName = utf8
+                            .decode(latin1.encode(_allactivities[id]["name"]));
+                        stravaID = _allactivities[id]["strava_activity_id"];
+                      });
+                    },
+                    // And/or any other gesture callback
+                    child: PolylineLayer(
+                      hitNotifier: hitNotifier,
+                      polylines: [
+                        for (var act in _allactivities)
+                          if (DateTime.parse(act['start_date'])
+                                  .isBefore(endDate) &&
+                              DateTime.parse(act['start_date'])
+                                  .isAfter(startDate))
+                            Polyline(
+                              // hitValue: utf8.decode(latin1.encode(act['name'])),
+                              hitValue: _allactivities.indexOf(act),
+                              points: PolylineToLatLng(act["map_polyline"]),
+                              color: TreenixColors.primaryPink,
+                            )
+                      ],
+                    ),
+                  ),
                 ),
+                // PolylineLayer(
+                //   hitNotifier: hitNotifier,
+                //   polylines: [
+                //     for (var act in _allactivities)
+                //       if (DateTime.parse(act['start_date']).isBefore(endDate) &&
+                //           DateTime.parse(act['start_date']).isAfter(startDate))
+                //         Polyline(
+                //           hitValue: act['name'],
+                //           points: PolylineToLatLng(act["map_polyline"]),
+                //           color: TreenixColors.primaryPink,
+                //         )
+                //   ],
+                // ),
               ],
             ),
           ),
@@ -164,6 +209,39 @@ class MapHeatmapState extends State<MapHeatmap> {
                   ),
                 ),
                 SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Material(
+                    color: const Color.fromARGB(50, 45, 45, 45),
+                    child: InkWell(
+                      hoverColor: TreenixColors.primaryPink,
+                      onTap: () {
+                        // GoRouter.of(context).go('/');
+                        html.window.open(
+                            "https://www.strava.com/activities/" + stravaID,
+                            '_blank');
+                      },
+                      child: Container(
+                        width: 150,
+                        // height: 40,
+                        padding: EdgeInsets.all(10),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              Text(
+                                activityName,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

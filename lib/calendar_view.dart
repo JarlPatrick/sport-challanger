@@ -24,14 +24,14 @@ Map<String, Color> varvid = {
 };
 
 class CalendarView extends StatelessWidget {
-  final Map<DateTime, bool> activityDurations;
+  // final Map<DateTime, bool> activityDurations;
   final List<Map<String, dynamic>>
       allActivities; // List of all activities with detailed info
   final int YEAR;
   final bool columns;
 
   CalendarView({
-    required this.activityDurations,
+    // required this.activityDurations,
     required this.allActivities,
     required this.YEAR,
     required this.columns,
@@ -39,6 +39,23 @@ class CalendarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<DateTime, bool> activityDurations = {};
+
+    for (var activity in allActivities) {
+      final parsedDate = DateTime.parse(activity['start_date']);
+      final normalizedDate =
+          DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
+      final durationSeconds = activity['elapsed_time'];
+      final isLongActivity = durationSeconds > 20 * 60; // 20 minutes
+
+      if (activityDurations.containsKey(normalizedDate)) {
+        activityDurations[normalizedDate] =
+            activityDurations[normalizedDate]! || isLongActivity;
+      } else {
+        activityDurations[normalizedDate] = isLongActivity;
+      }
+    }
+
     final now = DateTime(YEAR); //DateTime.now();
     final firstDayOfYear = DateTime(now.year, 1, 1);
     final lastDayOfYear = DateTime(now.year, 12, 31);
@@ -142,12 +159,12 @@ class CalendarView extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: week.map((day) {
-                                final isActivityDay =
+                                final isLongActivity =
                                     activityDurations.containsKey(
                                         DateTime(day.year, day.month, day.day));
-                                final isLongActivity = isActivityDay &&
-                                    activityDurations[DateTime(
-                                        day.year, day.month, day.day)]!;
+                                // final isLongActivity = isActivityDay &&
+                                //     activityDurations[DateTime(
+                                //         day.year, day.month, day.day)]!;
 
                                 return Expanded(
                                   child: Container(
@@ -155,11 +172,6 @@ class CalendarView extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: isLongActivity
                                           ? TreenixColors.primaryPink
-                                          // : isActivityDay
-                                          // ? Colors.yellow
-                                          // : day.month % 2 == 1
-                                          //     ? Colors.grey[200]
-                                          //     : Colors.grey[300],
                                           : TreenixColors.lightGray,
                                       borderRadius: BorderRadius.circular(4.0),
                                     ),

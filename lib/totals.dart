@@ -8,67 +8,111 @@ class Totals extends StatelessWidget {
     required this.allActivities,
   });
 
-  Map<String, IconData> ikoonid = {
-    'cycling': Icons.directions_bike,
-    'running': Icons.directions_run,
-    'swimming': Icons.pool,
-    'skiing': Icons.downhill_skiing,
-    'others': Icons.question_mark,
-    'walking': Icons.directions_walk,
-    'hiking': Icons.hiking_rounded,
+  Map<String, Map<String, dynamic>> allTypes = {
+    'Ride': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.directions_bike,
+    },
+    'VirtualRide': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.directions_bike,
+    },
+    'Run': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.directions_run,
+    },
+    'Swim': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.pool,
+    },
+    'NordicSki': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.downhill_skiing,
+    },
+    'Walk': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.directions_walk,
+    },
+    'Hike': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.hiking_rounded,
+    },
+    'Other': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.question_mark,
+    },
   };
 
-  Map<String, int> _calculateAllStats() {
+  // Map<String, IconData> ikoonid = {
+  //   'cycling': Icons.directions_bike,
+  //   'running': Icons.directions_run,
+  //   'swimming': Icons.pool,
+  //   'skiing': Icons.downhill_skiing,
+  //   'others': Icons.question_mark,
+  //   'walking': Icons.directions_walk,
+  //   'hiking': Icons.hiking_rounded,
+  // };
+
+  Map<String, Map<String, dynamic>> _calculateAllStats() {
     // Initialize stats for the week
-    int cyclingMinutes = 0;
-    int runningMinutes = 0;
-    int swimmingMinutes = 0;
-    int skiingMinutes = 0;
-    int walkingMinutes = 0;
-    int hikinggMinutes = 0;
-    int othersMinutes = 0;
+    // int cyclingMinutes = 0;
+    // int runningMinutes = 0;
+    // int swimmingMinutes = 0;
+    // int skiingMinutes = 0;
+    // int walkingMinutes = 0;
+    // int hikinggMinutes = 0;
+    // int othersMinutes = 0;
     for (var activity in allActivities) {
       final activityDate = DateTime.parse(activity['start_date']);
       final String type = activity['type'];
-      final int duration =
+      int duration =
           activity['moving_time'] ~/ 60; // Convert seconds to minutes
-      switch (type) {
-        case 'Ride':
-          cyclingMinutes += duration;
-          break;
-        case 'VirtualRide':
-          cyclingMinutes += duration;
-          break;
-        case 'Run':
-          runningMinutes += duration;
-          break;
-        case 'Swim':
-          swimmingMinutes += duration;
-          break;
-        case 'NordicSki':
-          skiingMinutes += duration;
-          break;
-        case 'Walk':
-          walkingMinutes += duration;
-          break;
-        case 'Hike':
-          hikinggMinutes += duration;
-          break;
-        default:
-          othersMinutes += duration;
-          break;
+      int distance = activity['distance'] ~/ 1;
+      if (allTypes.keys.contains(type)) {
+        allTypes[type]!["minutes"] += duration;
+        allTypes[type]!["meters"] += distance;
+      } else {
+        allTypes["Other"]!["minutes"] += duration;
+        // allTypes["Other"]!["meters"] +=
+        //     double.parse(activity['distance'] / 1000);
       }
+      // switch (type) {
+      //   case 'Ride':
+      //     cyclingMinutes += duration;
+      //     break;
+      //   case 'VirtualRide':
+      //     cyclingMinutes += duration;
+      //     break;
+      //   case 'Run':
+      //     runningMinutes += duration;
+      //     break;
+      //   case 'Swim':
+      //     swimmingMinutes += duration;
+      //     break;
+      //   case 'NordicSki':
+      //     skiingMinutes += duration;
+      //     break;
+      //   case 'Walk':
+      //     walkingMinutes += duration;
+      //     break;
+      //   case 'Hike':
+      //     hikinggMinutes += duration;
+      //     break;
+      //   default:
+      //     othersMinutes += duration;
+      //     break;
+      // }
     }
 
-    return {
-      'cycling': cyclingMinutes,
-      'running': runningMinutes,
-      'swimming': swimmingMinutes,
-      'skiing': skiingMinutes,
-      'walking': walkingMinutes,
-      'hiking': hikinggMinutes,
-      'others': othersMinutes,
-    };
+    return allTypes;
   }
 
   String _formatTime(int minutes) {
@@ -80,10 +124,10 @@ class Totals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Map<String, int> stats = _calculateAllStats();
-    Map<String, int> stats = Map.fromEntries(
-        _calculateAllStats().entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value)));
+    Map<String, Map<String, dynamic>> stats = _calculateAllStats();
+    // Map<String, int> stats = Map.fromEntries(
+    //     _calculateAllStats().entries.toList()
+    //       ..sort((a, b) => b.value.compareTo(a.value)));
 
     return Container(
         height: 160,
@@ -100,21 +144,30 @@ class Totals extends StatelessWidget {
             children: [
               SizedBox(width: 20),
               for (var entry in stats.entries)
-                if (entry.value > 0) ...[
+                if (entry.value["minutes"] > 0) ...[
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       // SizedBox(width: 20),
                       Icon(
-                        ikoonid[entry.key],
+                        entry.value["icon"],
+                        // ikoonid[entry.key],
                         color: TreenixColors.primaryPink,
                         size: 50,
                       ),
                       SizedBox(height: 10),
                       Text(
-                        _formatTime(
-                            entry.value), // Use a helper method for formatting
+                        _formatTime(entry.value[
+                            "minutes"]), // Use a helper method for formatting
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: TreenixColors.lightGray,
+                        ),
+                      ),
+                      Text(
+                        "${(entry.value["meters"] / 1000).toStringAsFixed(0)} km",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
