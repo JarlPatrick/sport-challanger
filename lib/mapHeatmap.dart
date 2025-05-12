@@ -98,6 +98,14 @@ class MapHeatmapState extends State<MapHeatmap> {
   final LayerHitNotifier hitNotifier = ValueNotifier(null);
   String activityName = "";
   String stravaID = "";
+  List<int> idList = [];
+
+  String _formatTime(int minutes) {
+    int hours = minutes ~/ 60; // Calculate hours
+    int remainingMinutes = minutes % 60; // Calculate remaining minutes
+
+    return '${hours} h:${remainingMinutes.toString().padLeft(2, "0")} min';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,11 +143,16 @@ class MapHeatmapState extends State<MapHeatmap> {
                       print("hit");
                       print(hitNotifier.value?.hitValues);
                       int id = hitNotifier.value!.hitValues.first as int;
+                      idList = [];
+                      hitNotifier.value!.hitValues.forEach((element) {
+                        idList.add(int.parse(element.toString()));
+                      });
 
                       setState(() {
-                        activityName = utf8
-                            .decode(latin1.encode(_allactivities[id]["name"]));
-                        stravaID = _allactivities[id]["strava_activity_id"];
+                        // idList = hitNotifier.value!.hitValues as List<int>;
+                        // activityName = utf8
+                        //     .decode(latin1.encode(_allactivities[id]["name"]));
+                        // stravaID = _allactivities[id]["strava_activity_id"];
                       });
                     },
                     // And/or any other gesture callback
@@ -192,7 +205,7 @@ class MapHeatmapState extends State<MapHeatmap> {
                         GoRouter.of(context).go('/');
                       },
                       child: Container(
-                        width: 150,
+                        width: 250,
                         // height: 40,
                         padding: EdgeInsets.all(10),
                         child: Center(
@@ -209,35 +222,86 @@ class MapHeatmapState extends State<MapHeatmap> {
                   ),
                 ),
                 SizedBox(height: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Material(
-                    color: const Color.fromARGB(50, 45, 45, 45),
-                    child: InkWell(
-                      hoverColor: TreenixColors.primaryPink,
-                      onTap: () {
-                        // GoRouter.of(context).go('/');
-                        html.window.open(
-                            "https://www.strava.com/activities/" + stravaID,
-                            '_blank');
-                      },
-                      child: Container(
-                        width: 150,
-                        // height: 40,
-                        padding: EdgeInsets.all(10),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Text(
-                                activityName,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
+                Container(
+                  height: MediaQuery.of(context).size.height - 200,
+                  width: 250,
+                  // decoration: BoxDecoration(
+                  //   borderRadius: BorderRadius.circular(10),
+                  //   color: const Color.fromARGB(50, 45, 45, 45),
+                  // ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(50, 45, 45, 45),
+                      ),
+                      child: Column(
+                        children: [
+                          for (int i in idList) ...[
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Material(
+                                color: const Color.fromARGB(50, 45, 45, 45),
+                                child: InkWell(
+                                  hoverColor: TreenixColors.primaryPink,
+                                  onTap: () {
+                                    // GoRouter.of(context).go('/');
+                                    html.window.open(
+                                        "https://www.strava.com/activities/" +
+                                            _allactivities[i]
+                                                ["strava_activity_id"],
+                                        '_blank');
+                                  },
+                                  child: Container(
+                                    width: 250,
+                                    // height: 40,
+                                    padding: EdgeInsets.all(10),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            utf8.decode(latin1.encode(
+                                                _allactivities[i]["name"])),
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              SizedBox(width: 40),
+                                              Text(
+                                                "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              Text(
+                                                _formatTime(_allactivities[i]
+                                                        ['moving_time'] ~/
+                                                    60),
+                                                // "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              SizedBox(width: 40),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              )
-                            ],
-                          ),
-                        ),
+                              ),
+                            ),
+                            SizedBox(height: 3),
+                          ],
+                        ],
                       ),
                     ),
                   ),

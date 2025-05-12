@@ -4,13 +4,13 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
 Map<String, IconData> ikoonid = {
-  'cycling': Icons.directions_bike,
-  'running': Icons.directions_run,
-  'swimming': Icons.pool,
-  'skiing': Icons.downhill_skiing,
-  'others': Icons.question_mark,
-  'walking': Icons.directions_walk,
-  'hiking': Icons.hiking_rounded,
+  'Ride': Icons.directions_bike,
+  'Run': Icons.directions_run,
+  'Swim': Icons.pool,
+  'NordicSki': Icons.downhill_skiing,
+  'Other': Icons.question_mark,
+  'Walk': Icons.directions_walk,
+  'Hike': Icons.hiking_rounded,
 };
 
 Map<String, Color> varvid = {
@@ -87,15 +87,16 @@ class _CalendarViewState extends State<CalendarView> {
     // }
   }
 
+  String _formatTimeMinutes(int minutes) {
+    int hours = minutes ~/ 60; // Calculate hours
+    int remainingMinutes = minutes % 60; // Calculate remaining minutes
+    return '${hours}:${remainingMinutes.toString().padLeft(2, "0")}';
+  }
+
+  Map<DateTime, Map<String, dynamic>> activitiesByDate = {};
+
   Map<String, Map<String, dynamic>> _calculateWeeklyStats(List<DateTime> week) {
     // Initialize stats for the week
-    // int cyclingMinutes = 0;
-    // int runningMinutes = 0;
-    // int swimmingMinutes = 0;
-    // int skiingMinutes = 0;
-    // int walkingMinutes = 0;
-    // int hikinggMinutes = 0;
-    // int othersMinutes = 0;
     Map<String, Map<String, dynamic>> allTypes = {
       'Ride': {
         'minutes': 0,
@@ -152,6 +153,7 @@ class _CalendarViewState extends State<CalendarView> {
       final activityDate = DateTime.parse(activity['start_date']);
       final normalizedDate =
           DateTime(activityDate.year, activityDate.month, activityDate.day);
+      activitiesByDate[normalizedDate] = activity;
       if (week.contains(normalizedDate)) {
         final String type = activity['type'];
         int duration =
@@ -165,50 +167,12 @@ class _CalendarViewState extends State<CalendarView> {
           // allTypes["Other"]!["meters"] +=
           //     double.parse(activity['distance'] / 1000);
         }
-        //   final String type = activity['type'];
-        //   final int duration =
-        //       activity['moving_time'] ~/ 60; // Convert seconds to minutes
-        //   switch (type) {
-        //     case 'Ride':
-        //       cyclingMinutes += duration;
-        //       break;
-        //     case 'VirtualRide':
-        //       cyclingMinutes += duration;
-        //       break;
-        //     case 'Run':
-        //       runningMinutes += duration;
-        //       break;
-        //     case 'Swim':
-        //       swimmingMinutes += duration;
-        //       break;
-        //     case 'NordicSki':
-        //       skiingMinutes += duration;
-        //       break;
-        //     case 'Walk':
-        //       walkingMinutes += duration;
-        //       break;
-        //     case 'Hike':
-        //       hikinggMinutes += duration;
-        //       break;
-        //     default:
-        //       othersMinutes += duration;
-        //       break;
-        //   }
-        // }
       }
-
-      // return {
-      //   'cycling': cyclingMinutes,
-      //   'running': runningMinutes,
-      //   'swimming': swimmingMinutes,
-      //   'skiing': skiingMinutes,
-      //   'walking': walkingMinutes,
-      //   'hiking': hikinggMinutes,
-      //   'others': othersMinutes,
-      // };
     }
     return allTypes;
   }
+
+  DateTime expanded = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -328,67 +292,208 @@ class _CalendarViewState extends State<CalendarView> {
                       Row(
                         // crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 220,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: week.map((day) {
-                                final isLongActivity =
-                                    activityDurations.containsKey(
-                                        DateTime(day.year, day.month, day.day));
-                                // final isLongActivity = isActivityDay &&
-                                //     activityDurations[DateTime(
-                                //         day.year, day.month, day.day)]!;
+                          // if (startnewmonth) ...[
+                          //   SizedBox(
+                          //     width: 25,
+                          //     height: 30,
+                          //     child: RotatedBox(
+                          //       quarterTurns: 3,
+                          //       child: Text(
+                          //         monthName,
+                          //         overflow: TextOverflow.visible,
+                          //         softWrap: false,
+                          //         maxLines: 1,
+                          //         textAlign: TextAlign.right,
+                          //         style: TextStyle(
+                          //           fontSize: 18,
+                          //           color: TreenixColors.primaryPink,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ] else ...[
+                          //   SizedBox(width: 25),
+                          // ],
+                          Material(
+                            color: const Color.fromARGB(0, 255, 255, 255),
+                            child: InkWell(
+                              onHover: (value) {
+                                // print(week.first.toString());
+                                setState(() {
+                                  if (value) {
+                                    expanded = week.first;
+                                  } else {
+                                    expanded = DateTime.now();
+                                  }
+                                });
 
-                                return Expanded(
-                                  child: Container(
-                                    margin: EdgeInsets.all(1.0),
-                                    decoration: BoxDecoration(
-                                      color: isLongActivity
-                                          ? TreenixColors.primaryPink
-                                          : TreenixColors.lightGray,
-                                      borderRadius: BorderRadius.circular(4.0),
-                                    ),
-                                    height: 30,
-                                    child: Center(
-                                      child: Text(
-                                        '${day.day}',
-                                        style: TextStyle(
-                                          color: isLongActivity
-                                              ? Colors.white
-                                              : Colors.black,
-                                          fontSize: 15,
-                                        ),
+                                // print(value);
+                              },
+                              onTap: () {
+                                // print("tap");
+                                // print(week.first.toString());
+                                setState(() {
+                                  expanded = week.first;
+                                });
+                              },
+                              child: (week.first == expanded)
+                                  ? Container(
+                                      width: 390,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: week.map((day) {
+                                          final isLongActivity =
+                                              activityDurations.containsKey(
+                                                  DateTime(day.year, day.month,
+                                                      day.day));
+
+                                          return Expanded(
+                                            child: Container(
+                                              margin: EdgeInsets.all(1.0),
+                                              decoration: BoxDecoration(
+                                                color: isLongActivity
+                                                    ? TreenixColors.primaryPink
+                                                    : TreenixColors.lightGray,
+                                                borderRadius:
+                                                    BorderRadius.circular(4.0),
+                                              ),
+                                              height: 60,
+                                              child: Center(
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      '${day.day}',
+                                                      style: TextStyle(
+                                                        color: isLongActivity
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                        fontSize: 10,
+                                                      ),
+                                                    ),
+                                                    if (activitiesByDate
+                                                        .containsKey(day))
+                                                      Column(
+                                                        children: [
+                                                          Icon(
+                                                            ikoonid[
+                                                                activitiesByDate[
+                                                                        day]![
+                                                                    'type']],
+                                                            // entry.value["icon"],
+                                                            color: Colors.white,
+                                                            size: 15,
+                                                          ),
+                                                          Text(
+                                                            _formatTimeMinutes(
+                                                                activitiesByDate[
+                                                                            day]![
+                                                                        'moving_time'] ~/
+                                                                    60),
+                                                            style: TextStyle(
+                                                              fontSize: 10,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "${(activitiesByDate[day]!['distance'] ~/ 1000).toString()} km",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  isLongActivity
+                                                                      ? Colors
+                                                                          .white
+                                                                      : Colors
+                                                                          .black,
+                                                              fontSize: 10,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
                                       ),
+                                    )
+                                  : Row(
+                                      children: [
+                                        Container(
+                                          width: 220,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: week.map((day) {
+                                              final isLongActivity =
+                                                  activityDurations.containsKey(
+                                                      DateTime(day.year,
+                                                          day.month, day.day));
+                                              // final isLongActivity = isActivityDay &&
+                                              //     activityDurations[DateTime(
+                                              //         day.year, day.month, day.day)]!;
+
+                                              return Expanded(
+                                                child: Container(
+                                                  margin: EdgeInsets.all(1.0),
+                                                  decoration: BoxDecoration(
+                                                    color: isLongActivity
+                                                        ? TreenixColors
+                                                            .primaryPink
+                                                        : TreenixColors
+                                                            .lightGray,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4.0),
+                                                  ),
+                                                  height: 30,
+                                                  child: Center(
+                                                    child: Text(
+                                                      '${day.day}',
+                                                      style: TextStyle(
+                                                        color: isLongActivity
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                        SizedBox(width: 5),
+                                        for (var entry in weekStats.entries
+                                            .where((e) =>
+                                                e.value[widget.summaryType] > 0)
+                                            .take(3))
+                                          if (entry.value[widget.summaryType] >
+                                              0) ...[
+                                            Icon(
+                                              // ikoonid[entry.key],
+                                              entry.value["icon"],
+                                              color: TreenixColors.primaryPink,
+                                              size: 20,
+                                            ),
+                                            _formatTime(
+                                                entry.value[widget.summaryType])
+                                            // Text(
+                                            //   _formatTime(entry.value[
+                                            //       widget.summaryType]), // Use a helper method for formatting
+                                            //   style: TextStyle(
+                                            //     fontSize: 15,
+                                            //     fontWeight: FontWeight.bold,
+                                            //     color: TreenixColors.lightGray,
+                                            //   ),
+                                            // ),
+                                          ],
+                                      ],
                                     ),
-                                  ),
-                                );
-                              }).toList(),
                             ),
                           ),
                           // Iterate through the map
-                          SizedBox(width: 5),
-                          for (var entry in weekStats.entries
-                              .where((e) => e.value[widget.summaryType] > 0)
-                              .take(3))
-                            if (entry.value[widget.summaryType] > 0) ...[
-                              Icon(
-                                // ikoonid[entry.key],
-                                entry.value["icon"],
-                                color: TreenixColors.primaryPink,
-                                size: 20,
-                              ),
-                              _formatTime(entry.value[widget.summaryType])
-                              // Text(
-                              //   _formatTime(entry.value[
-                              //       widget.summaryType]), // Use a helper method for formatting
-                              //   style: TextStyle(
-                              //     fontSize: 15,
-                              //     fontWeight: FontWeight.bold,
-                              //     color: TreenixColors.lightGray,
-                              //   ),
-                              // ),
-                            ],
                         ],
                       ),
                       if (endnewmonth) ...[
