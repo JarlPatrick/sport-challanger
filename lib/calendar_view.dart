@@ -23,25 +23,198 @@ Map<String, Color> varvid = {
   'hiking': Colors.grey,
 };
 
-class CalendarView extends StatelessWidget {
+class CalendarView extends StatefulWidget {
   // final Map<DateTime, bool> activityDurations;
   final List<Map<String, dynamic>>
       allActivities; // List of all activities with detailed info
   final int YEAR;
   final bool columns;
+  final String summaryType;
 
   CalendarView({
     // required this.activityDurations,
     required this.allActivities,
     required this.YEAR,
     required this.columns,
+    required this.summaryType,
   });
+
+  @override
+  State<CalendarView> createState() => _CalendarViewState();
+}
+
+class _CalendarViewState extends State<CalendarView> {
+  // String summaryType = "minutes";
+
+  Text _formatTime(int minutes) {
+    if (widget.summaryType == "minutes") {
+      int hours = minutes ~/ 60; // Calculate hours
+      int remainingMinutes = minutes % 60; // Calculate remaining minutes
+      return Text(
+        '${hours}:${remainingMinutes.toString().padLeft(2, "0")}', // Use a helper method for formatting
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: TreenixColors.lightGray,
+        ),
+      );
+    }
+    if (widget.summaryType == "meters") {
+      int hours = minutes ~/ 60; // Calculate hours
+      int remainingMinutes = minutes % 60; // Calculate remaining minutes
+
+      return Text(
+        '${(minutes / 1000).toStringAsFixed(0)}km', // Use a helper method for formatting
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: TreenixColors.lightGray,
+        ),
+      );
+    }
+    return Text(
+      "", // Use a helper method for formatting
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.bold,
+        color: TreenixColors.lightGray,
+      ),
+    );
+    // if (hours > 0) {
+    //   return '${hours}:${remainingMinutes} min';
+    // } else {
+    //   return '${remainingMinutes} min';
+    // }
+  }
+
+  Map<String, Map<String, dynamic>> _calculateWeeklyStats(List<DateTime> week) {
+    // Initialize stats for the week
+    // int cyclingMinutes = 0;
+    // int runningMinutes = 0;
+    // int swimmingMinutes = 0;
+    // int skiingMinutes = 0;
+    // int walkingMinutes = 0;
+    // int hikinggMinutes = 0;
+    // int othersMinutes = 0;
+    Map<String, Map<String, dynamic>> allTypes = {
+      'Ride': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.directions_bike,
+      },
+      'VirtualRide': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.directions_bike,
+      },
+      'Run': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.directions_run,
+      },
+      'Swim': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.pool,
+      },
+      'NordicSki': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.downhill_skiing,
+      },
+      'Walk': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.directions_walk,
+      },
+      'Hike': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.hiking_rounded,
+      },
+      'Rowing': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.rowing,
+      },
+      'Kayaking': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.kayaking,
+      },
+      'Other': {
+        'minutes': 0,
+        'meters': 0.0,
+        'icon': Icons.question_mark,
+      },
+    };
+    for (var activity in widget.allActivities) {
+      final activityDate = DateTime.parse(activity['start_date']);
+      final normalizedDate =
+          DateTime(activityDate.year, activityDate.month, activityDate.day);
+      if (week.contains(normalizedDate)) {
+        final String type = activity['type'];
+        int duration =
+            activity['moving_time'] ~/ 60; // Convert seconds to minutes
+        int distance = activity['distance'] ~/ 1;
+        if (allTypes.keys.contains(type)) {
+          allTypes[type]!["minutes"] += duration;
+          allTypes[type]!["meters"] += distance;
+        } else {
+          allTypes["Other"]!["minutes"] += duration;
+          // allTypes["Other"]!["meters"] +=
+          //     double.parse(activity['distance'] / 1000);
+        }
+        //   final String type = activity['type'];
+        //   final int duration =
+        //       activity['moving_time'] ~/ 60; // Convert seconds to minutes
+        //   switch (type) {
+        //     case 'Ride':
+        //       cyclingMinutes += duration;
+        //       break;
+        //     case 'VirtualRide':
+        //       cyclingMinutes += duration;
+        //       break;
+        //     case 'Run':
+        //       runningMinutes += duration;
+        //       break;
+        //     case 'Swim':
+        //       swimmingMinutes += duration;
+        //       break;
+        //     case 'NordicSki':
+        //       skiingMinutes += duration;
+        //       break;
+        //     case 'Walk':
+        //       walkingMinutes += duration;
+        //       break;
+        //     case 'Hike':
+        //       hikinggMinutes += duration;
+        //       break;
+        //     default:
+        //       othersMinutes += duration;
+        //       break;
+        //   }
+        // }
+      }
+
+      // return {
+      //   'cycling': cyclingMinutes,
+      //   'running': runningMinutes,
+      //   'swimming': swimmingMinutes,
+      //   'skiing': skiingMinutes,
+      //   'walking': walkingMinutes,
+      //   'hiking': hikinggMinutes,
+      //   'others': othersMinutes,
+      // };
+    }
+    return allTypes;
+  }
 
   @override
   Widget build(BuildContext context) {
     Map<DateTime, bool> activityDurations = {};
 
-    for (var activity in allActivities) {
+    for (var activity in widget.allActivities) {
       final parsedDate = DateTime.parse(activity['start_date']);
       final normalizedDate =
           DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
@@ -56,7 +229,7 @@ class CalendarView extends StatelessWidget {
       }
     }
 
-    final now = DateTime(YEAR); //DateTime.now();
+    final now = DateTime(widget.YEAR); //DateTime.now();
     final firstDayOfYear = DateTime(now.year, 1, 1);
     final lastDayOfYear = DateTime(now.year, 12, 31);
 
@@ -83,7 +256,7 @@ class CalendarView extends StatelessWidget {
     }
 
     List<List<List<DateTime>>> halves;
-    if (columns) {
+    if (widget.columns) {
       // halves = [weeks.sublist(0, 26), weeks.sublist(26)];
       halves = [
         weeks.sublist(0, 13),
@@ -133,9 +306,10 @@ class CalendarView extends StatelessWidget {
                   // Calculate stats for the week
                   // final weekStats = _calculateWeeklyStats(week);
                   // weekStats
-                  var weekStats = Map.fromEntries(
+                  Map<String, Map<String, dynamic>> weekStats = Map.fromEntries(
                       _calculateWeeklyStats(week).entries.toList()
-                        ..sort((a, b) => b.value.compareTo(a.value)));
+                        ..sort((a, b) => b.value[widget.summaryType]
+                            .compareTo(a.value[widget.summaryType])));
 
                   // Map<String, int> sortedMap = Map.fromEntries(sortedEntries);
 
@@ -193,26 +367,27 @@ class CalendarView extends StatelessWidget {
                             ),
                           ),
                           // Iterate through the map
-                          // weeklyBarView(weekStats: weekStats),
                           SizedBox(width: 5),
                           for (var entry in weekStats.entries
-                              .where((e) => e.value > 0)
+                              .where((e) => e.value[widget.summaryType] > 0)
                               .take(3))
-                            if (entry.value > 0) ...[
+                            if (entry.value[widget.summaryType] > 0) ...[
                               Icon(
-                                ikoonid[entry.key],
+                                // ikoonid[entry.key],
+                                entry.value["icon"],
                                 color: TreenixColors.primaryPink,
                                 size: 20,
                               ),
-                              Text(
-                                _formatTime(entry
-                                    .value), // Use a helper method for formatting
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: TreenixColors.lightGray,
-                                ),
-                              ),
+                              _formatTime(entry.value[widget.summaryType])
+                              // Text(
+                              //   _formatTime(entry.value[
+                              //       widget.summaryType]), // Use a helper method for formatting
+                              //   style: TextStyle(
+                              //     fontSize: 15,
+                              //     fontWeight: FontWeight.bold,
+                              //     color: TreenixColors.lightGray,
+                              //   ),
+                              // ),
                             ],
                         ],
                       ),
@@ -232,117 +407,6 @@ class CalendarView extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  String _formatTime(int minutes) {
-    int hours = minutes ~/ 60; // Calculate hours
-    int remainingMinutes = minutes % 60; // Calculate remaining minutes
-
-    return '${hours}:${remainingMinutes.toString().padLeft(2, "0")}';
-    // if (hours > 0) {
-    //   return '${hours}:${remainingMinutes} min';
-    // } else {
-    //   return '${remainingMinutes} min';
-    // }
-  }
-
-  Map<String, int> _calculateWeeklyStats(List<DateTime> week) {
-    // Initialize stats for the week
-    int cyclingMinutes = 0;
-    int runningMinutes = 0;
-    int swimmingMinutes = 0;
-    int skiingMinutes = 0;
-    int walkingMinutes = 0;
-    int hikinggMinutes = 0;
-    int othersMinutes = 0;
-    for (var activity in allActivities) {
-      final activityDate = DateTime.parse(activity['start_date']);
-      final normalizedDate =
-          DateTime(activityDate.year, activityDate.month, activityDate.day);
-      if (week.contains(normalizedDate)) {
-        final String type = activity['type'];
-        final int duration =
-            activity['moving_time'] ~/ 60; // Convert seconds to minutes
-        switch (type) {
-          case 'Ride':
-            cyclingMinutes += duration;
-            break;
-          case 'VirtualRide':
-            cyclingMinutes += duration;
-            break;
-          case 'Run':
-            runningMinutes += duration;
-            break;
-          case 'Swim':
-            swimmingMinutes += duration;
-            break;
-          case 'NordicSki':
-            skiingMinutes += duration;
-            break;
-          case 'Walk':
-            walkingMinutes += duration;
-            break;
-          case 'Hike':
-            hikinggMinutes += duration;
-            break;
-          default:
-            othersMinutes += duration;
-            break;
-        }
-      }
-    }
-
-    return {
-      'cycling': cyclingMinutes,
-      'running': runningMinutes,
-      'swimming': swimmingMinutes,
-      'skiing': skiingMinutes,
-      'walking': walkingMinutes,
-      'hiking': hikinggMinutes,
-      'others': othersMinutes,
-    };
-  }
-}
-
-class weeklyBarView extends StatelessWidget {
-  const weeklyBarView({
-    super.key,
-    required this.weekStats,
-  });
-  final Map<String, int> weekStats;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 10,
-      width: 100,
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.start,
-          groupsSpace: 0,
-          gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(show: false),
-          borderData: FlBorderData(show: false),
-          barGroups: [
-            for (var entry in weekStats.entries)
-              if (entry.value > 0) ...[
-                BarChartGroupData(
-                  x: 0, // Position on the X-axis
-                  barRods: [
-                    BarChartRodData(
-                      toY: 20, // Height of the bar
-                      width: entry.value.toDouble() / 3, // Width of the bar
-                      // width: 20,
-                      color: varvid[entry.key], // Bar color
-                      borderRadius: BorderRadius.zero,
-                    ),
-                  ],
-                ),
-              ],
-          ],
-        ),
       ),
     );
   }

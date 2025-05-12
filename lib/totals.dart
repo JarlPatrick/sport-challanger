@@ -44,6 +44,16 @@ class Totals extends StatelessWidget {
       'meters': 0.0,
       'icon': Icons.hiking_rounded,
     },
+    'Rowing': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.rowing,
+    },
+    'Kayaking': {
+      'minutes': 0,
+      'meters': 0.0,
+      'icon': Icons.kayaking,
+    },
     'Other': {
       'minutes': 0,
       'meters': 0.0,

@@ -188,6 +188,17 @@ class _HomeState extends State<Home> {
     loadYear(YEAR);
   }
 
+  String summaryType = "minutes";
+  void setSummryType(bool minutesTrue) {
+    setState(() {
+      if (minutesTrue) {
+        summaryType = "minutes";
+      } else {
+        summaryType = "meters";
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -209,6 +220,7 @@ class _HomeState extends State<Home> {
                     Yearselector(
                       YEAR: YEAR,
                       setYearCallback: setYear,
+                      setSummryTypeCallback: setSummryType,
                       viewStateCallback: changeViewState,
                     ),
                     SizedBox(width: 20),
@@ -292,6 +304,7 @@ class _HomeState extends State<Home> {
                       allActivities: _activities,
                       YEAR: YEAR,
                       columns: true,
+                      summaryType: summaryType,
                     ),
                   TreenixView.Map => MapView(
                       key: mapViewKey,
@@ -329,6 +342,7 @@ class _HomeState extends State<Home> {
                       child: Yearselector(
                         YEAR: YEAR,
                         setYearCallback: setYear,
+                        setSummryTypeCallback: setSummryType,
                         viewStateCallback: changeViewState,
                       ),
                     ),
@@ -373,6 +387,7 @@ class _HomeState extends State<Home> {
                               allActivities: _activities,
                               YEAR: YEAR,
                               columns: false,
+                              summaryType: summaryType,
                             ),
                           ),
                         ],
