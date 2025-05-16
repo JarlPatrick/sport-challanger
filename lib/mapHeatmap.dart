@@ -356,186 +356,396 @@ class MapHeatmapState extends State<MapHeatmap> {
               ],
             ),
           ),
-          Positioned(
-            left: 50,
-            top: 50,
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Material(
-                    color: const Color.fromARGB(50, 45, 45, 45),
-                    child: InkWell(
-                      hoverColor: TreenixColors.primaryPink,
-                      onTap: () {
-                        GoRouter.of(context).go('/');
-                      },
-                      child: Container(
-                        width: 250,
-                        // height: 40,
-                        padding: EdgeInsets.all(10),
-                        child: Center(
-                          child: Text(
-                            "HOME",
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
+          if (MediaQuery.of(context).size.width > 600) ...[
+            Positioned(
+              left: 50,
+              top: 50,
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Material(
+                      color: const Color.fromARGB(50, 45, 45, 45),
+                      child: InkWell(
+                        hoverColor: TreenixColors.primaryPink,
+                        onTap: () {
+                          GoRouter.of(context).go('/');
+                        },
+                        child: Container(
+                          width: 250,
+                          // height: 40,
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Text(
+                              "HOME",
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  height: MediaQuery.of(context).size.height - 200,
-                  width: 250,
-                  // decoration: BoxDecoration(
-                  //   borderRadius: BorderRadius.circular(10),
-                  //   color: const Color.fromARGB(50, 45, 45, 45),
-                  // ),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color.fromARGB(50, 45, 45, 45),
-                      ),
-                      child: Column(
-                        children: [
-                          for (int i in idList) ...[
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Material(
-                                color: const Color.fromARGB(50, 45, 45, 45),
-                                child: InkWell(
-                                  hoverColor: TreenixColors.primaryPink,
-                                  onHover: (value) {
-                                    setState(() {
-                                      if (value) {
-                                        highlighted = i;
-                                      } else {
-                                        highlighted = -1;
-                                      }
-                                    });
-                                  },
-                                  onTap: () {
-                                    // GoRouter.of(context).go('/');
-                                    html.window.open(
-                                        "https://www.strava.com/activities/" +
-                                            _allactivities[i]
-                                                ["strava_activity_id"],
-                                        '_blank');
-                                  },
-                                  child: Container(
-                                    width: 250,
-                                    // height: 40,
-                                    padding: EdgeInsets.all(5),
-                                    child: Center(
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            utf8.decode(latin1.encode(
-                                                _allactivities[i]["name"])),
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.white,
+                  SizedBox(height: 10),
+                  Container(
+                    height: MediaQuery.of(context).size.height - 200,
+                    width: 250,
+                    // decoration: BoxDecoration(
+                    //   borderRadius: BorderRadius.circular(10),
+                    //   color: const Color.fromARGB(50, 45, 45, 45),
+                    // ),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: const Color.fromARGB(50, 45, 45, 45),
+                        ),
+                        child: Column(
+                          children: [
+                            for (int i in idList) ...[
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Material(
+                                  color: const Color.fromARGB(50, 45, 45, 45),
+                                  child: InkWell(
+                                    hoverColor: TreenixColors.primaryPink,
+                                    onHover: (value) {
+                                      setState(() {
+                                        if (value) {
+                                          highlighted = i;
+                                        } else {
+                                          highlighted = -1;
+                                        }
+                                      });
+                                    },
+                                    onTap: () {
+                                      // GoRouter.of(context).go('/');
+                                      html.window.open(
+                                          "https://www.strava.com/activities/" +
+                                              _allactivities[i]
+                                                  ["strava_activity_id"],
+                                          '_blank');
+                                    },
+                                    child: Container(
+                                      width: 250,
+                                      // height: 40,
+                                      padding: EdgeInsets.all(5),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              utf8.decode(latin1.encode(
+                                                  _allactivities[i]["name"])),
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.white,
+                                              ),
                                             ),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Text(
-                                                DateFormat("d MMM yyyy").format(
-                                                    DateTime.parse(
-                                                        _allactivities[i]
-                                                            ['start_date'])),
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.white,
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Text(
+                                                  DateFormat("d MMM yyyy")
+                                                      .format(DateTime.parse(
+                                                          _allactivities[i]
+                                                              ['start_date'])),
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
-                                              ),
-                                              Text(
-                                                "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.white,
+                                                Text(
+                                                  "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
-                                              ),
-                                              Text(
-                                                _formatTime(_allactivities[i]
-                                                        ['moving_time'] ~/
-                                                    60),
-                                                // "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.white,
+                                                Text(
+                                                  _formatTime(_allactivities[i]
+                                                          ['moving_time'] ~/
+                                                      60),
+                                                  // "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          )
-                                        ],
+                                              ],
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 3),
+                              SizedBox(height: 3),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            left: 25,
-            width: MediaQuery.of(context).size.width - 50,
-            child: RangeSlider(
-              activeColor: TreenixColors.primaryPink,
-              values: RangeValues(startValue, endValue),
-              min: minDays,
-              max: maxDays,
-              divisions: maxDays.toInt(),
-              onChanged: (values) {
-                setState(() {
-                  startValue = values.start;
-                  endValue = values.end;
-                  startDate = zeroDate.add(Duration(days: startValue.toInt()));
-                  endDate = zeroDate.add(Duration(days: endValue.toInt()));
-                });
-              },
-              labels: RangeLabels(
-                zeroDate
-                    .add(Duration(days: startValue.toInt()))
-                    .toLocal()
-                    .toString()
-                    .split(' ')[0],
-                zeroDate
-                    .add(Duration(days: endValue.toInt()))
-                    .toLocal()
-                    .toString()
-                    .split(' ')[0],
+                ],
               ),
-              onChangeEnd: (values) {
-                setState(() {
-                  startValue = values.start;
-                  endValue = values.end;
-                  startDate = zeroDate.add(Duration(days: startValue.toInt()));
-                  endDate = zeroDate.add(Duration(days: endValue.toInt()));
-                  // print(startDate);
-                  // print(endDate);
-                });
-              },
             ),
-          ),
+            Positioned(
+              bottom: 20,
+              left: 25,
+              width: MediaQuery.of(context).size.width - 50,
+              child: RangeSlider(
+                activeColor: TreenixColors.primaryPink,
+                values: RangeValues(startValue, endValue),
+                min: minDays,
+                max: maxDays,
+                divisions: maxDays.toInt(),
+                onChanged: (values) {
+                  setState(() {
+                    startValue = values.start;
+                    endValue = values.end;
+                    startDate =
+                        zeroDate.add(Duration(days: startValue.toInt()));
+                    endDate = zeroDate.add(Duration(days: endValue.toInt()));
+                  });
+                },
+                labels: RangeLabels(
+                  zeroDate
+                      .add(Duration(days: startValue.toInt()))
+                      .toLocal()
+                      .toString()
+                      .split(' ')[0],
+                  zeroDate
+                      .add(Duration(days: endValue.toInt()))
+                      .toLocal()
+                      .toString()
+                      .split(' ')[0],
+                ),
+                onChangeEnd: (values) {
+                  setState(() {
+                    startValue = values.start;
+                    endValue = values.end;
+                    startDate =
+                        zeroDate.add(Duration(days: startValue.toInt()));
+                    endDate = zeroDate.add(Duration(days: endValue.toInt()));
+                    // print(startDate);
+                    // print(endDate);
+                  });
+                },
+              ),
+            ),
+          ] else ...[
+            Positioned(
+              left: 20,
+              top: 20,
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Material(
+                      color: const Color.fromARGB(50, 45, 45, 45),
+                      child: InkWell(
+                        hoverColor: TreenixColors.primaryPink,
+                        onTap: () {
+                          GoRouter.of(context).go('/');
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Icon(Icons.arrow_back),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  // Container(
+                  //   height: MediaQuery.of(context).size.height - 200,
+                  //   width: 250,
+                  //   // decoration: BoxDecoration(
+                  //   //   borderRadius: BorderRadius.circular(10),
+                  //   //   color: const Color.fromARGB(50, 45, 45, 45),
+                  //   // ),
+                  //   child: SingleChildScrollView(
+                  //     scrollDirection: Axis.vertical,
+                  //     child: Container(
+                  //       decoration: BoxDecoration(
+                  //         borderRadius: BorderRadius.circular(10),
+                  //         color: const Color.fromARGB(50, 45, 45, 45),
+                  //       ),
+                  //       child: ),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+            // Positioned(
+            //   bottom: 40,
+            //   child:
+            // ),
+            Positioned(
+              bottom: 0,
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: 200,
+                    ),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      // height: 200,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(50, 45, 45, 45),
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          children: [
+                            for (int i in idList) ...[
+                              SizedBox(height: 3),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Material(
+                                  color: const Color.fromARGB(50, 45, 45, 45),
+                                  child: InkWell(
+                                    hoverColor: TreenixColors.primaryPink,
+                                    onHover: (value) {
+                                      setState(() {
+                                        if (value) {
+                                          highlighted = i;
+                                        } else {
+                                          highlighted = -1;
+                                        }
+                                      });
+                                    },
+                                    onTap: () {
+                                      // GoRouter.of(context).go('/');
+                                      html.window.open(
+                                          "https://www.strava.com/activities/" +
+                                              _allactivities[i]
+                                                  ["strava_activity_id"],
+                                          '_blank');
+                                    },
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width -
+                                          20,
+                                      // height: 40,
+                                      padding: EdgeInsets.all(5),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            SizedBox(
+                                              width: 200,
+                                              child: Text(
+                                                utf8.decode(latin1.encode(
+                                                    _allactivities[i]["name"])),
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              DateFormat("d MMM yyyy").format(
+                                                  DateTime.parse(
+                                                      _allactivities[i]
+                                                          ['start_date'])),
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            Text(
+                                              "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            Text(
+                                              _formatTime(_allactivities[i]
+                                                      ['moving_time'] ~/
+                                                  60),
+                                              // "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 3),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    color: const Color.fromARGB(50, 45, 45, 45),
+                    child: RangeSlider(
+                      activeColor: TreenixColors.primaryPink,
+                      values: RangeValues(startValue, endValue),
+                      min: minDays,
+                      max: maxDays,
+                      divisions: maxDays.toInt(),
+                      onChanged: (values) {
+                        setState(() {
+                          startValue = values.start;
+                          endValue = values.end;
+                          startDate =
+                              zeroDate.add(Duration(days: startValue.toInt()));
+                          endDate =
+                              zeroDate.add(Duration(days: endValue.toInt()));
+                        });
+                      },
+                      labels: RangeLabels(
+                        zeroDate
+                            .add(Duration(days: startValue.toInt()))
+                            .toLocal()
+                            .toString()
+                            .split(' ')[0],
+                        zeroDate
+                            .add(Duration(days: endValue.toInt()))
+                            .toLocal()
+                            .toString()
+                            .split(' ')[0],
+                      ),
+                      onChangeEnd: (values) {
+                        setState(() {
+                          startValue = values.start;
+                          endValue = values.end;
+                          startDate =
+                              zeroDate.add(Duration(days: startValue.toInt()));
+                          endDate =
+                              zeroDate.add(Duration(days: endValue.toInt()));
+                          // print(startDate);
+                          // print(endDate);
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ]
         ],
       ),
     );
