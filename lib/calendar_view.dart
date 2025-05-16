@@ -1,3 +1,5 @@
+import 'dart:ui_web';
+
 import 'package:Treenix/_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -93,7 +95,7 @@ class _CalendarViewState extends State<CalendarView> {
     return '${hours}:${remainingMinutes.toString().padLeft(2, "0")}';
   }
 
-  Map<DateTime, Map<String, dynamic>> activitiesByDate = {};
+  Map<DateTime, List<Map<String, dynamic>>> activitiesByDate = {};
 
   Map<String, Map<String, dynamic>> _calculateWeeklyStats(List<DateTime> week) {
     // Initialize stats for the week
@@ -149,11 +151,16 @@ class _CalendarViewState extends State<CalendarView> {
         'icon': Icons.question_mark,
       },
     };
+    activitiesByDate = {};
     for (var activity in widget.allActivities) {
       final activityDate = DateTime.parse(activity['start_date']);
       final normalizedDate =
           DateTime(activityDate.year, activityDate.month, activityDate.day);
-      activitiesByDate[normalizedDate] = activity;
+      if (activitiesByDate.containsKey(normalizedDate)) {
+        activitiesByDate[normalizedDate]!.add(activity);
+      } else {
+        activitiesByDate[normalizedDate] = [activity];
+      }
       if (week.contains(normalizedDate)) {
         final String type = activity['type'];
         int duration =
@@ -221,20 +228,20 @@ class _CalendarViewState extends State<CalendarView> {
 
     List<List<List<DateTime>>> halves;
     if (widget.columns) {
-      // halves = [weeks.sublist(0, 26), weeks.sublist(26)];
-      halves = [
-        weeks.sublist(0, 13),
-        weeks.sublist(13, 26),
-        weeks.sublist(26, 39),
-        weeks.sublist(39)
-      ];
+      halves = [weeks.sublist(0, 26), weeks.sublist(26)];
+      // halves = [
+      //   weeks.sublist(0, 13),
+      //   weeks.sublist(13, 26),
+      //   weeks.sublist(26, 39),
+      //   weeks.sublist(39)
+      // ];
     } else {
       halves = [weeks];
     }
 
     return Container(
-      width: 1600,
-      height: 600,
+      width: 800,
+      height: 900,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         // color: const Color.fromARGB(255, 255, 184, 251)),
@@ -278,14 +285,15 @@ class _CalendarViewState extends State<CalendarView> {
                   // Map<String, int> sortedMap = Map.fromEntries(sortedEntries);
 
                   return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (startnewmonth) ...[
                         SizedBox(height: 5),
                         Text(
                           monthName,
                           style: TextStyle(
-                            fontSize: 18,
-                            color: TreenixColors.primaryPink,
+                            fontSize: 15,
+                            color: const Color.fromARGB(255, 255, 255, 255),
                           ),
                         ),
                       ],
@@ -375,39 +383,53 @@ class _CalendarViewState extends State<CalendarView> {
                                                         .containsKey(day))
                                                       Column(
                                                         children: [
-                                                          Icon(
-                                                            ikoonid[
-                                                                activitiesByDate[
-                                                                        day]![
-                                                                    'type']],
-                                                            // entry.value["icon"],
-                                                            color: Colors.white,
-                                                            size: 15,
-                                                          ),
-                                                          Text(
-                                                            _formatTimeMinutes(
-                                                                activitiesByDate[
-                                                                            day]![
-                                                                        'moving_time'] ~/
-                                                                    60),
-                                                            style: TextStyle(
-                                                              fontSize: 10,
-                                                              color:
-                                                                  Colors.white,
+                                                          for (Map<String,
+                                                                  dynamic> activity
+                                                              in activitiesByDate[
+                                                                  day]!)
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              children: [
+                                                                Icon(
+                                                                  ikoonid[activity[
+                                                                      'type']],
+                                                                  // entry.value["icon"],
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 15,
+                                                                ),
+                                                                Text(
+                                                                  _formatTimeMinutes(
+                                                                      activity[
+                                                                              'moving_time'] ~/
+                                                                          60),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        10,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                                // Text(
+                                                                //   "${(activitiesByDate[day]!['distance'] ~/ 1000).toString()} km",
+                                                                //   style: TextStyle(
+                                                                //     color:
+                                                                //         isLongActivity
+                                                                //             ? Colors
+                                                                //                 .white
+                                                                //             : Colors
+                                                                //                 .black,
+                                                                //     fontSize: 10,
+                                                                //   ),
+                                                                // ),
+                                                              ],
                                                             ),
-                                                          ),
-                                                          Text(
-                                                            "${(activitiesByDate[day]!['distance'] ~/ 1000).toString()} km",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  isLongActivity
-                                                                      ? Colors
-                                                                          .white
-                                                                      : Colors
-                                                                          .black,
-                                                              fontSize: 10,
-                                                            ),
-                                                          ),
                                                         ],
                                                       ),
                                                   ],
@@ -421,7 +443,7 @@ class _CalendarViewState extends State<CalendarView> {
                                   : Row(
                                       children: [
                                         Container(
-                                          width: 220,
+                                          width: 175,
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -447,7 +469,8 @@ class _CalendarViewState extends State<CalendarView> {
                                                         BorderRadius.circular(
                                                             4.0),
                                                   ),
-                                                  height: 30,
+                                                  height: 25,
+                                                  // width: 20,
                                                   child: Center(
                                                     child: Text(
                                                       '${day.day}',
@@ -455,7 +478,7 @@ class _CalendarViewState extends State<CalendarView> {
                                                         color: isLongActivity
                                                             ? Colors.white
                                                             : Colors.black,
-                                                        fontSize: 15,
+                                                        fontSize: 13,
                                                       ),
                                                     ),
                                                   ),
@@ -497,12 +520,13 @@ class _CalendarViewState extends State<CalendarView> {
                         ],
                       ),
                       if (endnewmonth) ...[
-                        SizedBox(height: 5),
+                        // SizedBox(height: 5),
                         Text(
                           monthName,
+                          textAlign: TextAlign.start,
                           style: TextStyle(
-                            fontSize: 18,
-                            color: TreenixColors.primaryPink,
+                            fontSize: 15,
+                            color: const Color.fromARGB(255, 255, 255, 255),
                           ),
                         ),
                       ],

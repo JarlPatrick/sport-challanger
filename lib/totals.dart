@@ -54,6 +54,10 @@ class Totals extends StatelessWidget {
       'meters': 0.0,
       'icon': Icons.kayaking,
     },
+    // 'WeightTraining': {
+    //   'minutes': 0,
+    //   'meters': 0.0,
+    // },
     'Other': {
       'minutes': 0,
       'meters': 0.0,
@@ -141,7 +145,7 @@ class Totals extends StatelessWidget {
 
     return Container(
         height: 160,
-        width: 600,
+        width: 400,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: TreenixColors.grayBackground,

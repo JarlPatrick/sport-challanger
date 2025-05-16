@@ -74,7 +74,7 @@ class TreenixStreak extends StatelessWidget {
             viewStateCallback(TreenixView.Calendar);
           },
           child: Container(
-            width: 120,
+            width: 170,
             height: 160,
             padding: EdgeInsets.all(10),
             child: Center(
@@ -92,7 +92,7 @@ class TreenixStreak extends StatelessWidget {
                   Text(
                     streak.toString(),
                     style: TextStyle(
-                      fontSize: 50,
+                      fontSize: 40,
                       color: Colors.white,
                     ),
                   ),

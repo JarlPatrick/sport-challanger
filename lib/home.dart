@@ -208,95 +208,108 @@ class _HomeState extends State<Home> {
         return Scaffold(
           backgroundColor: TreenixColors.lightGray,
           body: Center(
-            child: Column(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.max,
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
-                    SizedBox(width: 30),
-                    Yearselector(
-                      YEAR: YEAR,
-                      setYearCallback: setYear,
-                      setSummryTypeCallback: setSummryType,
-                      viewStateCallback: changeViewState,
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Yearselector(
+                          YEAR: YEAR,
+                          setYearCallback: setYear,
+                          setSummryTypeCallback: setSummryType,
+                          viewStateCallback: changeViewState,
+                        ),
+                        SizedBox(width: 20),
+                        // if (YEAR == 2025) ...[
+                        TreenixStreak(
+                          allActivities: _activities,
+                          viewStateCallback: changeViewState,
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 20),
-                    // if (YEAR == 2025) ...[
-                    TreenixStreak(
-                      allActivities: _activities,
-                      viewStateCallback: changeViewState,
-                    ),
-                    SizedBox(width: 20),
-                    // ],
+                    SizedBox(height: 20),
                     JarlsNumber(
                       allActivities: _allactivities,
                       viewStateCallback: changeViewState,
                       year: YEAR,
                     ),
-
-                    SizedBox(width: 20),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Material(
-                        color: TreenixColors.grayBackground,
-                        child: InkWell(
-                          hoverColor: TreenixColors.primaryPink,
-                          onTap: () {
-                            GoRouter.of(context).go('/heatmap');
-                          },
-                          child: Container(
-                            width: 120,
-                            height: 160,
-                            padding: EdgeInsets.all(10),
-                            child: Center(
-                              child: Text(
-                                "HEATMAP",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(width: 20),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Material(
+                            color: TreenixColors.grayBackground,
+                            child: InkWell(
+                              hoverColor: TreenixColors.primaryPink,
+                              onTap: () {
+                                GoRouter.of(context).go('/heatmap');
+                              },
+                              child: Container(
+                                width: 190,
+                                height: 160,
+                                padding: EdgeInsets.all(10),
+                                child: Center(
+                                  child: Text(
+                                    "HEATMAP",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(width: 20),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Material(
-                        color: TreenixColors.grayBackground,
-                        child: InkWell(
-                          hoverColor: TreenixColors.primaryPink,
-                          onTap: () {
-                            GoRouter.of(context).go('/terrax');
-                          },
-                          child: Container(
-                            width: 100,
-                            height: 160,
-                            padding: EdgeInsets.all(10),
-                            child: Center(
-                              child: Text(
-                                "TERRAX",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
+                        SizedBox(width: 20),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Material(
+                            color: TreenixColors.grayBackground,
+                            child: InkWell(
+                              hoverColor: TreenixColors.primaryPink,
+                              onTap: () {
+                                GoRouter.of(context).go('/terrax');
+                              },
+                              child: Container(
+                                width: 190,
+                                height: 160,
+                                padding: EdgeInsets.all(10),
+                                child: Center(
+                                  child: Text(
+                                    "TERRAX",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
+                        SizedBox(width: 20),
+                      ],
                     ),
-                    SizedBox(width: 20),
+                    SizedBox(
+                      height: 20,
+                    ),
                     Totals(allActivities: _activities),
+                    SizedBox(
+                      height: 20,
+                    ),
                   ],
-                ),
-                SizedBox(
-                  height: 20,
                 ),
                 switch (viewState) {
                   TreenixView.Calendar => CalendarView(
@@ -338,7 +351,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Container(
                       height: 170,
-                      width: (MediaQuery.of(context).size.width - 40) / 3,
+                      width: (MediaQuery.of(context).size.width - 40) / 3 + 10,
                       child: Yearselector(
                         YEAR: YEAR,
                         setYearCallback: setYear,
@@ -356,15 +369,78 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     SizedBox(width: 10),
-                    Container(
-                      height: 170,
-                      width: (MediaQuery.of(context).size.width - 40) / 3 + 30,
-                      child: JarlsNumber(
-                        allActivities: _allactivities,
-                        viewStateCallback: changeViewState,
-                        year: YEAR,
-                      ),
-                    ),
+                    Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Material(
+                            color: TreenixColors.grayBackground,
+                            child: InkWell(
+                              hoverColor: TreenixColors.primaryPink,
+                              onTap: () {
+                                GoRouter.of(context).go('/heatmap');
+                              },
+                              child: Container(
+                                width:
+                                    (MediaQuery.of(context).size.width - 40) /
+                                            3 -
+                                        0,
+                                height: 80,
+                                padding: EdgeInsets.all(10),
+                                child: Center(
+                                  child: Text(
+                                    "HEATMAP",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Material(
+                            color: TreenixColors.grayBackground,
+                            child: InkWell(
+                              hoverColor: TreenixColors.primaryPink,
+                              onTap: () {
+                                GoRouter.of(context).go('/terrax');
+                              },
+                              child: Container(
+                                width:
+                                    (MediaQuery.of(context).size.width - 40) /
+                                            3 -
+                                        0,
+                                height: 80,
+                                padding: EdgeInsets.all(10),
+                                child: Center(
+                                  child: Text(
+                                    "TERRAX",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                    // Container(
+                    //   height: 170,
+                    //   width: (MediaQuery.of(context).size.width - 40) / 3 + 30,
+                    //   child: JarlsNumber(
+                    //     allActivities: _allactivities,
+                    //     viewStateCallback: changeViewState,
+                    //     year: YEAR,
+                    //   ),
+                    // ),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -374,14 +450,14 @@ class _HomeState extends State<Home> {
                   child: switch (viewState) {
                     TreenixView.Calendar => Column(
                         children: [
+                          // Container(
+                          //   height: 120,
+                          //   width: MediaQuery.of(context).size.width - 20,
+                          //   child: Totals(allActivities: _activities),
+                          // ),
+                          // SizedBox(height: 10),
                           Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width - 20,
-                            child: Totals(allActivities: _activities),
-                          ),
-                          SizedBox(height: 10),
-                          Container(
-                            height: MediaQuery.of(context).size.height - 330,
+                            height: MediaQuery.of(context).size.height - 200,
                             width: MediaQuery.of(context).size.width - 20,
                             child: CalendarView(
                               allActivities: _activities,

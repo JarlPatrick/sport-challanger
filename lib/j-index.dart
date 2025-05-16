@@ -65,8 +65,8 @@ class JarlsNumber extends StatelessWidget {
             viewStateCallback(TreenixView.JGraph);
           },
           child: Container(
-            width: 200,
-            height: 160,
+            width: 400,
+            height: 100,
             padding: EdgeInsets.all(10),
             child: Center(
               child: Column(
@@ -100,6 +100,12 @@ class JarlsNumber extends StatelessWidget {
                               color: Colors.white,
                             ),
                           ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
                           Text(
                             LastYearJN.toString(),
                             style: TextStyle(
@@ -134,6 +140,12 @@ class JarlsNumber extends StatelessWidget {
                               color: Colors.white,
                             ),
                           ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
                           Text(
                             LastQuarterJN.toString(),
                             style: TextStyle(

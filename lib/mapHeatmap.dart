@@ -1,6 +1,7 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart' as ll;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'dart:convert';
@@ -107,6 +108,8 @@ class MapHeatmapState extends State<MapHeatmap> {
     return '${hours} h:${remainingMinutes.toString().padLeft(2, "0")} min';
   }
 
+  int highlighted = -1;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,7 +144,7 @@ class MapHeatmapState extends State<MapHeatmap> {
                   child: GestureDetector(
                     onTap: () {
                       print("hit");
-                      print(hitNotifier.value?.hitValues);
+                      // print(hitNotifier.value?.hitValues);
                       int id = hitNotifier.value!.hitValues.first as int;
                       idList = [];
                       hitNotifier.value!.hitValues.forEach((element) {
@@ -159,17 +162,48 @@ class MapHeatmapState extends State<MapHeatmap> {
                     child: PolylineLayer(
                       hitNotifier: hitNotifier,
                       polylines: [
-                        for (var act in _allactivities)
-                          if (DateTime.parse(act['start_date'])
+                        if (highlighted != -1) ...[
+                          for (var act in _allactivities)
+                            if (DateTime.parse(act['start_date'])
+                                    .isBefore(endDate) &&
+                                DateTime.parse(act['start_date'])
+                                    .isAfter(startDate) &&
+                                _allactivities.indexOf(act) != highlighted)
+                              Polyline(
+                                  strokeWidth: 1,
+                                  // hitValue: utf8.decode(latin1.encode(act['name'])),
+                                  hitValue: _allactivities.indexOf(act),
+                                  points: PolylineToLatLng(act["map_polyline"]),
+                                  color:
+                                      const Color.fromARGB(255, 175, 175, 175)),
+                          if (DateTime.parse(
+                                      _allactivities[highlighted]['start_date'])
                                   .isBefore(endDate) &&
-                              DateTime.parse(act['start_date'])
+                              DateTime.parse(
+                                      _allactivities[highlighted]['start_date'])
                                   .isAfter(startDate))
                             Polyline(
-                              // hitValue: utf8.decode(latin1.encode(act['name'])),
-                              hitValue: _allactivities.indexOf(act),
-                              points: PolylineToLatLng(act["map_polyline"]),
-                              color: TreenixColors.primaryPink,
-                            )
+                                strokeWidth: 2,
+                                // hitValue: utf8.decode(latin1.encode(act['name'])),
+                                hitValue: _allactivities
+                                    .indexOf(_allactivities[highlighted]),
+                                points: PolylineToLatLng(
+                                    _allactivities[highlighted]
+                                        ["map_polyline"]),
+                                color: TreenixColors.primaryPink),
+                        ] else
+                          for (var act in _allactivities)
+                            if (DateTime.parse(act['start_date'])
+                                    .isBefore(endDate) &&
+                                DateTime.parse(act['start_date'])
+                                    .isAfter(startDate) &&
+                                _allactivities.indexOf(act) != highlighted)
+                              Polyline(
+                                  // hitValue: utf8.decode(latin1.encode(act['name'])),
+                                  hitValue: _allactivities.indexOf(act),
+                                  points: PolylineToLatLng(act["map_polyline"]),
+                                  color:
+                                      const Color.fromARGB(255, 255, 0, 128)),
                       ],
                     ),
                   ),
@@ -245,6 +279,15 @@ class MapHeatmapState extends State<MapHeatmap> {
                                 color: const Color.fromARGB(50, 45, 45, 45),
                                 child: InkWell(
                                   hoverColor: TreenixColors.primaryPink,
+                                  onHover: (value) {
+                                    setState(() {
+                                      if (value) {
+                                        highlighted = i;
+                                      } else {
+                                        highlighted = -1;
+                                      }
+                                    });
+                                  },
                                   onTap: () {
                                     // GoRouter.of(context).go('/');
                                     html.window.open(
@@ -269,8 +312,20 @@ class MapHeatmapState extends State<MapHeatmap> {
                                             ),
                                           ),
                                           Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              SizedBox(width: 40),
+                                              Text(
+                                                DateFormat("d MMM yyyy").format(
+                                                    DateTime.parse(
+                                                        _allactivities[i]
+                                                            ['start_date'])),
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
                                               Text(
                                                 "${(_allactivities[i]['distance'] / 1000).toStringAsFixed(1)} km",
                                                 style: TextStyle(
@@ -278,7 +333,6 @@ class MapHeatmapState extends State<MapHeatmap> {
                                                   color: Colors.white,
                                                 ),
                                               ),
-                                              Spacer(),
                                               Text(
                                                 _formatTime(_allactivities[i]
                                                         ['moving_time'] ~/
@@ -289,7 +343,6 @@ class MapHeatmapState extends State<MapHeatmap> {
                                                   color: Colors.white,
                                                 ),
                                               ),
-                                              SizedBox(width: 40),
                                             ],
                                           )
                                         ],
