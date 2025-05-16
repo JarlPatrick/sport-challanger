@@ -8,6 +8,7 @@ import 'package:polyline_codec/polyline_codec.dart';
 import 'dart:math';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '_colors.dart';
 import 'api_dummy.dart';
@@ -130,38 +131,72 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Future<void> getActivities() async {
-    try {
-      String lambdaUrl =
-          "https://6iks67rav1.execute-api.eu-north-1.amazonaws.com/default/request-all-athletes-activities";
-      String token = await getToken();
+  Future<String> fetchActivityJson() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cacheKey = 'my_cached_data';
+    final cacheTimeKey = 'my_cached_data_timestamp';
+    final now = DateTime.now().millisecondsSinceEpoch;
 
-      final response = await http.get(
-        Uri.parse(lambdaUrl),
-        headers: <String, String>{
-          "Authorization": token,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final activities = jsonDecode(response.body);
-
-        List<Map<String, dynamic>> allactivities = [];
-        for (var activity in activities) {
-          allactivities.add(activity);
-        }
-        print(allactivities.length);
-
-        setState(() {
-          _allactivities = allactivities;
-        });
-        loadYear(YEAR);
-      } else {
-        print("Error: ${response.statusCode} - ${response.body}");
+    if (prefs.containsKey(cacheKey) && prefs.containsKey(cacheTimeKey)) {
+      final cachedTime = prefs.getInt(cacheTimeKey)!;
+      if (now - cachedTime < Duration(hours: 1).inMilliseconds) {
+        return prefs.getString(cacheKey)!;
       }
-    } catch (e) {
-      print("Exception: $e");
     }
+
+    String lambdaUrl =
+        "https://6iks67rav1.execute-api.eu-north-1.amazonaws.com/default/request-all-athletes-activities";
+    String token = await getToken();
+
+    final response = await http.get(
+      Uri.parse(lambdaUrl),
+      headers: <String, String>{
+        "Authorization": token,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      prefs.setString(cacheKey, response.body);
+      prefs.setInt(cacheTimeKey, now);
+      return response.body;
+    }
+
+    return "";
+  }
+
+  Future<void> getActivities() async {
+    // try {
+    //   String lambdaUrl =
+    //       "https://6iks67rav1.execute-api.eu-north-1.amazonaws.com/default/request-all-athletes-activities";
+    //   String token = await getToken();
+
+    //   final response = await http.get(
+    //     Uri.parse(lambdaUrl),
+    //     headers: <String, String>{
+    //       "Authorization": token,
+    //     },
+    //   );
+
+    //   if (response.statusCode == 200) {
+    // final activities = jsonDecode(response.body);
+    final activities = jsonDecode(await fetchActivityJson());
+
+    List<Map<String, dynamic>> allactivities = [];
+    for (var activity in activities) {
+      allactivities.add(activity);
+    }
+    print(allactivities.length);
+
+    setState(() {
+      _allactivities = allactivities;
+    });
+    loadYear(YEAR);
+    //   } else {
+    //     print("Error: ${response.statusCode} - ${response.body}");
+    //   }
+    // } catch (e) {
+    //   print("Exception: $e");
+    // }
   }
 
   Future<void> _authenticate() async {
