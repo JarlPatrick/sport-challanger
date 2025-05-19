@@ -13,6 +13,7 @@ import 'amplifyconfiguration.dart';
 
 // import 'auth.dart';
 import 'home.dart';
+import 'privacyPolicy.dart';
 
 void main() {
   usePathUrlStrategy();
@@ -46,35 +47,74 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Authenticator(
-      child: MaterialApp.router(
-        title: "Treenix",
-        builder: Authenticator.builder(),
-        // color: Color(0x2E2E2E),
-        routerConfig: GoRouter(
-          routes: [
-            GoRoute(
-              path: '/',
-              // builder: (context, state) => StravaAuthPage(),
-              builder: (context, state) => Home(),
+    return MaterialApp.router(
+      title: "Treenix",
+      routerConfig: GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => Authenticator(
+              child: MaterialApp(
+                builder: Authenticator.builder(),
+                home: Home(),
+              ),
             ),
-            GoRoute(
-              path: '/terrax',
-              // builder: (context, state) => StravaAuthPage(),
-              builder: (context, state) => MapTerraX(),
+          ),
+          GoRoute(
+            path: '/terrax',
+            builder: (context, state) => Authenticator(
+              child: MaterialApp(
+                builder: Authenticator.builder(),
+                home: MapTerraX(),
+              ),
             ),
-            GoRoute(
-              path: '/heatmap',
-              // builder: (context, state) => StravaAuthPage(),
-              builder: (context, state) => MapHeatmap(),
+          ),
+          GoRoute(
+            path: '/heatmap',
+            // builder: (context, state) => MapHeatmap(),
+            builder: (context, state) => Authenticator(
+              child: MaterialApp(
+                builder: Authenticator.builder(),
+                home: MapHeatmap(),
+              ),
             ),
-            // GoRoute(
-            //   path: "/home",
-            //   builder: (context, state) => Home(),
-            // ),
-          ],
-        ),
+          ),
+          GoRoute(
+            path: '/privacy-policy',
+            builder: (context, state) => PrivacyPolicyScreen(),
+          ),
+        ],
       ),
     );
+    // return Authenticator(
+    //   child: MaterialApp.router(
+    //     title: "Treenix",
+    //     builder: Authenticator.builder(),
+    //     // color: Color(0x2E2E2E),
+    //     routerConfig: GoRouter(
+    //       routes: [
+    //         GoRoute(
+    //           path: '/',
+    //           // builder: (context, state) => StravaAuthPage(),
+    //           builder: (context, state) => Home(),
+    //         ),
+    //         GoRoute(
+    //           path: '/terrax',
+    //           // builder: (context, state) => StravaAuthPage(),
+    //           builder: (context, state) => MapTerraX(),
+    //         ),
+    //         GoRoute(
+    //           path: '/heatmap',
+    //           // builder: (context, state) => StravaAuthPage(),
+    //           builder: (context, state) => MapHeatmap(),
+    //         ),
+    //         // GoRoute(
+    //         //   path: "/home",
+    //         //   builder: (context, state) => Home(),
+    //         // ),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }
